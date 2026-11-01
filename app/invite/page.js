@@ -48,6 +48,8 @@ export default function Invite() {
           <button className="btn ghost" onClick={() => { setPick(null); setPhone(''); }}>בחרו מישהו אחר</button>
         </div>
       </>}
-    </section></main>
+    </section>
+    <div className="row" style={{ marginTop: 16 }}><a className="btn ghost" href="/">← חזרה לדשבורד</a></div>
+    </main>
   );
 }
