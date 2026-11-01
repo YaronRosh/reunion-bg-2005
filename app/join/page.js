@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { getPeople, getUser, sendCode, claimPerson, myPerson, onAuth } from '@/lib/data';
+import { getPeople, getUser, sendCode, claimPerson, myPerson, onAuth, signOut } from '@/lib/data';
 import { searchPeople } from '@/lib/search';
 import { CLASSES, RSVP } from '@/lib/classes';
 
@@ -91,7 +91,7 @@ export default function Join() {
       {step === 5 && <div>
         <h2>אתם ברשימה{pick ? `, ${pick.name.split(' ').slice(-1)[0]}` : ''}</h2>
         <p className="sub">תודה. עכשיו הכי עוזר: להביא את מי שאתם מכירים מהשכבה.</p>
-        <div className="row"><Link href="/invite" className="btn">הביאו חבר מהשכבה</Link><Link href="/" className="btn ghost">לדשבורד</Link></div>
+        <div className="row"><Link href="/invite" className="btn">הביאו חבר מהשכבה</Link><Link href="/" className="btn ghost">לדשבורד</Link><button className="btn ghost" onClick={async () => { await signOut(); location.href = '/'; }}>התנתקות</button></div>
       </div>}
     </section></main>
   );
