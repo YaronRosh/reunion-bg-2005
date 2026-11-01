@@ -4,13 +4,14 @@ import { usePathname } from 'next/navigation';
 import { CLASSES } from '@/lib/classes';
 import { DEMO } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
-import { getUser, onAuth, signOut } from '@/lib/data';
+import { getUser, onAuth, signOut, isAdmin } from '@/lib/data';
 
 export function Shell({ children }) {
   const path = usePathname();
   const [me, setMe] = useState(null);
-  useEffect(() => { const load = () => getUser().then(setMe); load(); return onAuth(load); }, []);
-  const links = [['/', 'בית'], ['/join', 'מצאו אותי'], ['/invite', 'הזמנת חברים'], ['/admin', 'מארגנים']];
+  const [admin, setAdmin] = useState(false);
+  useEffect(() => { const load = async () => { const u = await getUser(); setMe(u); setAdmin(await isAdmin(u)); }; load(); return onAuth(load); }, []);
+  const links = [['/', 'בית'], ['/join', 'מצאו אותי'], ['/invite', 'הזמנת חברים'], ...(admin ? [['/admin', 'מארגנים']] : [])];
   return (
     <div className="wrap">
       <header className="nav">
@@ -19,7 +20,7 @@ export function Shell({ children }) {
           {links.map(([h, t]) => <Link key={h} href={h} aria-current={path === h ? 'page' : undefined}>{t}</Link>)}
         </nav>
       </header>
-      <div className="who">{me ? <><span>מחובר: <b dir="ltr">{me.email}</b></span><button onClick={async () => { await signOut(); setMe(null); location.href = '/'; }}>יציאה</button></> : <Link href="/join">לא מחוברים. התחברות</Link>}</div>
+      <div className="who">{me ? <><span>מחובר: <b dir="ltr">{me.email}</b></span><button onClick={async () => { await signOut(); setMe(null); setAdmin(false); location.href = '/'; }}>יציאה</button></> : <Link href="/join">לא מחוברים. התחברות</Link>}</div>
       {DEMO && <p className="hint" style={{ textAlign: 'center' }}>מצב הדגמה: הנתונים כאן לדוגמה בלבד.</p>}
       {children}
       <footer>מחזור 2005 · בן גוריון · נס ציונה</footer>
