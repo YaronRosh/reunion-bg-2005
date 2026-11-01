@@ -1,0 +1,62 @@
+'use client';
+import { useEffect, useMemo, useState } from 'react';
+import { getUser, sendCode, verifyCode, isAdmin, getPeople, getAnnouncements, postAnnouncement, deleteAnnouncement, importRows, signOut } from '@/lib/data';
+import { parseCsv, toPeople } from '@/lib/csv';
+import { CLASSES } from '@/lib/classes';
+
+export default function Admin() {
+  const [user, setUser] = useState(undefined);
+  const [ok, setOk] = useState(false);
+  const [email, setEmail] = useState(''); const [code, setCode] = useState(''); const [sent, setSent] = useState(false);
+  const [ann, setAnn] = useState([]); const [people, setPeople] = useState([]);
+  const [f, setF] = useState({ title: '', body: '', pinned: true });
+  const [cls, setCls] = useState(0); const [msg, setMsg] = useState('');
+
+  const load = async () => { setAnn(await getAnnouncements()); setPeople(await getPeople()); };
+  useEffect(() => { (async () => { const u = await getUser(); setUser(u); if (u) { setOk(await isAdmin(u)); load(); } })(); }, []);
+
+  const missing = useMemo(() => people.filter((p) => p.match !== 'sure' && (!cls || p.class_no === cls)), [people, cls]);
+
+  if (user === undefined) return <p className="hint">טוען...</p>;
+  if (!user) return (
+    <main><section className="card" style={{ marginTop: 18 }}>
+      <h2>כניסה למארגנים</h2>
+      <label htmlFor="e">אימייל</label>
+      <input id="e" type="email" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} />
+      {sent && <><label htmlFor="c">קוד</label><input id="c" dir="ltr" value={code} onChange={(e) => setCode(e.target.value)} /></>}
+      <div className="row" style={{ marginTop: 16 }}>
+        {!sent ? <button className="btn" onClick={async () => { await sendCode(email); setSent(true); }}>שלחו קוד</button>
+          : <button className="btn" onClick={async () => { await verifyCode(email, code); const u = await getUser(); setUser(u); setOk(await isAdmin(u)); load(); }}>כניסה</button>}
+      </div>
+    </section></main>);
+  if (!ok) return <main><section className="card" style={{ marginTop: 18 }}><h2>אין הרשאת מארגן</h2><p className="sub">המשתמש {user.email} לא ברשימת המארגנים. בקשו מיורון להוסיף.</p></section></main>;
+
+  return (
+    <main>
+      <section className="card" style={{ marginTop: 18 }}>
+        <h2>הודעה חדשה</h2>
+        <label htmlFor="t">כותרת</label><input id="t" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} />
+        <label htmlFor="b">תוכן</label><textarea id="b" value={f.body} onChange={(e) => setF({ ...f, body: e.target.value })} />
+        <label style={{ display: 'flex', gap: 10, alignItems: 'center' }}><input type="checkbox" style={{ width: 22, minHeight: 22 }} checked={f.pinned} onChange={(e) => setF({ ...f, pinned: e.target.checked })} />להצמיד בראש האתר</label>
+        <div className="row" style={{ marginTop: 14 }}><button className="btn" disabled={!f.title || !f.body} onClick={async () => { await postAnnouncement(f); setF({ title: '', body: '', pinned: true }); load(); }}>פרסמו</button></div>
+        <div className="list" style={{ marginTop: 18 }}>{ann.map((a) => <div className="item" key={a.id}><span>{a.title}</span><button className="pill" onClick={async () => { await deleteAnnouncement(a.id); load(); }}>מחיקה</button></div>)}</div>
+      </section>
+
+      <section className="card">
+        <h2>מי עוד חסר</h2>
+        <p className="sub">{missing.length} אנשים שלא זוהו בביטחון.</p>
+        <div className="tabs"><button className="pill" aria-pressed={!cls} onClick={() => setCls(0)}>הכול</button>
+          {CLASSES.map((c) => <button key={c.no} className="pill" aria-pressed={cls === c.no} onClick={() => setCls(c.no)}>יב{c.no}</button>)}</div>
+        <div className="list">{missing.slice(0, 80).map((p) => <div className="item" key={p.id}><span>{p.name}</span><small>יב{p.class_no} · {p.match === 'maybe' ? 'לא בטוח' : 'לא זוהה'}</small></div>)}</div>
+      </section>
+
+      <section className="card">
+        <h2>ייבוא מהגיליון</h2>
+        <p className="sub">ייצאו את לשונית "כולם" כ-CSV והעלו כאן. שמות וכיתות בלבד נשמרים.</p>
+        <input type="file" accept=".csv" onChange={async (e) => { const t = await e.target.files[0].text(); const r = toPeople(parseCsv(t)); const res = await importRows(r); setMsg(res.error || `יובאו ${r.length} אנשים`); load(); }} />
+        {msg && <p className="hint">{msg}</p>}
+        <div className="row" style={{ marginTop: 14 }}><button className="btn ghost" onClick={async () => { await signOut(); location.reload(); }}>יציאה</button></div>
+      </section>
+    </main>
+  );
+}
