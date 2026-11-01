@@ -30,7 +30,7 @@ export default function Join() {
 
   async function send(e) { e.preventDefault(); setBusy(true); setErr('');
     const r = await sendCode(email.trim()); setBusy(false);
-    if (r.error) setErr('לא הצלחנו לשלוח. בדקו את כתובת המייל.'); else if (r.demo) refresh(); else setStep(2); }
+    if (r.error) setErr(/rate|limit|seconds/i.test(r.error) ? 'נשלחו יותר מדי מיילים בזמן קצר. נסו שוב בעוד כמה דקות.' : 'לא הצלחנו לשלוח (' + r.error + ').'); else if (r.demo) refresh(); else setStep(2); }
   async function save(e) { e.preventDefault(); setBusy(true); setErr('');
     const r = await claimPerson(pick, user, { phone, email, rsvp }); setBusy(false);
     if (r.error) setErr('מישהו כבר זיהה את השם הזה. כתבו למארגנים ונסדר.'); else setStep(5); }
