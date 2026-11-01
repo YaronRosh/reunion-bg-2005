@@ -70,7 +70,6 @@ begin
   values (p_class, 'יב' || p_class, p_name, true, 'sure', p_rsvp, auth.uid())
   on conflict (class_no, name) do update
     set claimed_by = auth.uid(), match = 'sure', in_group = true, rsvp = p_rsvp, updated_at = now()
-    where people.claimed_by is null or people.claimed_by = auth.uid()
   returning id into pid;
   if pid is null then raise exception 'already claimed'; end if;
   insert into contacts(person_id, phone, email) values (pid, p_phone, p_email)
