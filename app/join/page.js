@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { getPeople, ensureSession, claimPerson, sendCode, signOut } from '@/lib/data';
+import { getPeople, ensureSession, claimPerson, becomeAdmin } from '@/lib/data';
 import { searchPeople } from '@/lib/search';
 import { CLASSES } from '@/lib/classes';
 import { useAuth } from '@/components/auth';
@@ -80,12 +80,12 @@ export default function Join() {
       </form>}
 
       {!pick && <div style={{ marginTop: 26, borderTop: '1px solid var(--line)', paddingTop: 14 }}>
-        {!org ? <button className="pill" onClick={() => setOrg(true)}>אני מארגן/ת</button> : !sent ? <>
-          <label htmlFor="e">אימייל מארגנים</label>
-          <input id="e" type="email" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <div className="row" style={{ marginTop: 12 }}><button className="btn ghost" onClick={async () => { const r = await sendCode(email.trim(), '/'); if (r.error) setErr('לא נשלח: ' + r.error); else setSent(true); }}>שלחו קישור כניסה</button></div>
+        {!org ? <button className="pill" onClick={() => setOrg(true)}>אני מארגן/ת</button> : <>
+          <label htmlFor="oc">קוד מארגנים</label>
+          <input id="oc" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="off" />
+          <div className="row" style={{ marginTop: 12 }}><button className="btn ghost" onClick={async () => { try { await ensureSession(); const ok = await becomeAdmin(email); if (ok) window.location.href = '/admin'; else setErr('הקוד לא נכון.'); } catch { setErr('לא הצלחנו. נסו שוב.'); } }}>כניסה</button></div>
           {err && <p className="err">{err}</p>}
-        </> : <p className="hint">שלחנו קישור ל-{email}. לחצו עליו כדי להיכנס.</p>}
+        </>}
       </div>}
     </section></main>
   );
