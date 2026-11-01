@@ -95,3 +95,14 @@ footer{padding:36px 0 50px;color:var(--muted);font-size:13px;text-align:center}
 .picked{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0 4px;padding:12px 14px;border-radius:14px;background:var(--ink);border:1.5px solid var(--gold)}
 .picked small{color:var(--muted)}.x{width:36px;height:36px;border-radius:50%;border:0;background:var(--ink-3);color:var(--paper);font-size:22px;cursor:pointer;line-height:1}
 .item:disabled{cursor:default}
+
+/* hero: parallax that follows the pointer/finger + gentle idle float */
+.stage{--mx:0;--my:0;perspective:700px;touch-action:pan-y}
+.b{transition:transform .25s ease-out;animation:bfloat 7s ease-in-out infinite;transform:translate(calc(var(--mx)*var(--d,40)*1px),calc(var(--my)*var(--d,40)*1px))}
+.b1{--d:-30}.b2{--d:-60}.b3{--d:80}.b4{--d:50}.b5{--d:110}.b6{--d:-20}
+.b2,.b4{animation-delay:-2s}.b3,.b6{animation-delay:-4s}
+@keyframes bfloat{0%,100%{margin-top:0}50%{margin-top:-14px}}
+.year{transition:transform .2s ease-out;transform:rotateY(calc(var(--mx)*14deg)) rotateX(calc(var(--my)*-14deg)) translate(calc(var(--mx)*-10px),calc(var(--my)*-10px));
+  animation:yglow 4s ease-in-out infinite}
+@keyframes yglow{0%,100%{filter:drop-shadow(0 8px 30px #ffc85744)}50%{filter:drop-shadow(0 8px 44px #ffc857aa)}}
+@media (prefers-reduced-motion:reduce){.b,.year{animation:none;transition:none}}

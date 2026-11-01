@@ -16,10 +16,16 @@ export default function Home() {
     const text = 'מחזור 2005 בן גוריון: ערב מחזור באזור אפריל בנס ציונה. בואו לוודא שאתם ברשימה ועזרו לנו להגיע לכולם: ' + location.origin;
     window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
   };
+  const move = (e) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty('--mx', ((e.clientX - r.left) / r.width - 0.5).toFixed(3));
+    e.currentTarget.style.setProperty('--my', ((e.clientY - r.top) / r.height - 0.5).toFixed(3));
+  };
+  const leave = (e) => { e.currentTarget.style.setProperty('--mx', 0); e.currentTarget.style.setProperty('--my', 0); };
   return (
     <main>
       <section className="hero">
-        <div className="stage" aria-hidden="true">
+        <div className="stage" aria-hidden="true" onPointerMove={move} onPointerLeave={leave}>
           <i className="b b1" /><i className="b b2" /><i className="b b3" /><i className="b b4" /><i className="b b5" /><i className="b b6" />
           <p className="year">2005</p>
         </div>
