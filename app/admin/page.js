@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { getUser, sendCode, isAdmin, getPeople, getAnnouncements, postAnnouncement, deleteAnnouncement, importRows, signOut } from '@/lib/data';
+import { getUser, isAdmin, getPeople, getAnnouncements, postAnnouncement, deleteAnnouncement, importRows, signOut } from '@/lib/data';
 import { parseCsv, toPeople } from '@/lib/csv';
 import { CLASSES } from '@/lib/classes';
 import { DEMO } from '@/lib/supabase';
@@ -19,16 +19,8 @@ export default function Admin() {
   const missing = useMemo(() => people.filter((p) => p.match !== 'sure' && (!cls || p.class_no === cls)), [people, cls]);
 
   if (user === undefined) return <p className="hint">טוען...</p>;
-  if (!user) return (
-    <main><section className="card" style={{ marginTop: 18 }}>
-      <h2>כניסה למארגנים</h2>
-      {!sent ? <>
-        <label htmlFor="e">אימייל</label>
-        <input id="e" type="email" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <div className="row" style={{ marginTop: 16 }}><button className="btn" onClick={async () => { const r = await sendCode(email.trim(), '/admin'); if (r.demo) { setUser(await getUser()); setOk(true); load(); } else setSent(true); }}>שלחו לי קישור</button></div>
-      </> : <p className="sub">שלחנו קישור כניסה ל-<b dir="ltr">{email}</b>. לחצו עליו ותחזרו לכאן מחוברים.</p>}
-    </section></main>);
-  if (!ok) return <main><section className="card" style={{ marginTop: 18 }}><h2>אין הרשאת מארגן</h2><p className="sub">המשתמש {user.email} לא ברשימת המארגנים. בקשו מיורון להוסיף.</p></section></main>;
+  if (!user) { if (typeof window !== 'undefined') window.location.replace('/join'); return null; }
+  if (!ok) { if (typeof window !== 'undefined') window.location.replace('/'); return null; }
 
   return (
     <main>
