@@ -16,9 +16,10 @@ export function useAuth() {
       } catch { live && setS({ status: 'anon', user: null, person: null }); }
     };
     load();
+    const to = setTimeout(() => live && setS((x) => x.status === 'loading' ? { status: 'anon', user: null, person: null } : x), 6000);
     const off = onAuth(load);
     window.addEventListener('focus', load);
-    return () => { live = false; off(); window.removeEventListener('focus', load); };
+    return () => { live = false; clearTimeout(to); off(); window.removeEventListener('focus', load); };
   }, []);
   return s;
 }
