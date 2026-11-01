@@ -25,7 +25,7 @@ export default function Invite() {
   return (
     <main><section className="card" style={{ marginTop: 18 }}>
       <h2>הזמינו חבר מהשכבה</h2>
-      <p className="sub">חפשו שם, בחרו אותו, והודעה מוכנה תיפתח לכם בווטסאפ. שום מספר לא נשמר אצלנו. מי שכבר בפנים מסומן בירוק.</p>
+      <p className="sub">חפשו שם, בחרו אותו, והודעה מוכנה תיפתח לכם בווטסאפ. שום מספר לא נשמר אצלנו. מי שכבר בפנים מסומן בירוק, ואפשר להזמין גם אותו.</p>
 
       {pick && <div className="picked">
         <div><b>{pick.name}</b><small> · יב{pick.class_no}</small></div>
@@ -36,7 +36,7 @@ export default function Invite() {
         <label htmlFor="q">חיפוש שם</label>
         <input id="q" value={q} onChange={(e) => setQ(e.target.value)} placeholder="שם משפחה או שם פרטי" autoFocus />
         <div className="list">{res.map((p) => { const [t, c] = STATE[p.match]; const done = p.match === 'sure';
-          return <button key={p.id} className="item" disabled={done} onClick={() => setPick(p)} style={done ? { opacity: .7, cursor: 'default' } : undefined}>
+          return <button key={p.id} className="item" onClick={() => setPick(p)}>
             <span>{p.name}<small style={{ marginInlineStart: 8 }}>יב{p.class_no}</small></span>
             <span className="chip" style={{ color: c, background: 'transparent', border: `1px solid ${c}` }}>{done ? '✓ ' : ''}{t}</span></button>; })}
           {q && !res.length && <p className="hint">אין התאמה. נסו שם אחר.</p>}</div>
