@@ -45,6 +45,7 @@ export function Stack({ c }) {
 }
 
 export function Dashboard({ t, by }) {
+  const [open, setOpen] = useState(null);
   return (
     <>
       <div className="dash">
@@ -59,10 +60,18 @@ export function Dashboard({ t, by }) {
         {CLASSES.map((c) => {
           const s = by[c.no] || { total: 0, sure: 0, maybe: 0, none: 0 };
           return (
-            <div className="cls" key={c.no}>
-              <div><strong>יב{c.no}</strong><small>{c.coord}</small></div>
-              <Stack c={s} />
-              <span className="pct">{s.total ? Math.round(((s.sure + s.maybe * 0) / s.total) * 100) : 0}%</span>
+            <div className="clsw" key={c.no}>
+              <button className="cls" aria-expanded={open === c.no} onClick={() => setOpen(open === c.no ? null : c.no)}>
+                <div><strong>יב{c.no}</strong><small>{c.coord}</small></div>
+                <Stack c={s} />
+                <span className="pct">{s.total ? Math.round((s.sure / s.total) * 100) : 0}%</span>
+              </button>
+              {open === c.no && <div className="clsd">
+                <div><span className="dot" style={{ background: COLORS.sure }} /><b>{s.sure}</b><em>זוהו</em></div>
+                <div><span className="dot" style={{ background: COLORS.maybe }} /><b>{s.maybe}</b><em>צריך לאשר</em></div>
+                <div><span className="dot" style={{ background: COLORS.none }} /><b>{s.none}</b><em>עוד לא מצאנו</em></div>
+                <small>סה״כ {s.total} בכיתה</small>
+              </div>}
             </div>
           );
         })}
