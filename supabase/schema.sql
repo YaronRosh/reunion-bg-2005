@@ -51,3 +51,11 @@ create policy ann_admin on announcements for all to authenticated using (is_admi
 insert into announcements (title, body, pinned)
 select 'שומרים את התאריך', 'ערב מחזור באזור אפריל, באולם אירועים בנס ציונה. פרטים נוספים בהמשך, ממשיכים לחפש את כולם.', true
 where not exists (select 1 from announcements);
+
+-- הרשאות ל-Data API (בטוח גם אם "expose new tables" כבוי); ה-RLS למעלה הוא שמגביל בפועל
+grant usage on schema public to anon, authenticated;
+grant select on people, announcements to anon, authenticated;
+grant update on people to authenticated;
+grant insert, update, delete on people, announcements to authenticated;
+grant select, insert, update, delete on contacts to authenticated;
+grant execute on function is_admin() to anon, authenticated;
