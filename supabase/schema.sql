@@ -59,3 +59,21 @@ grant update on people to authenticated;
 grant insert, update, delete on people, announcements to authenticated;
 grant select, insert, update, delete on contacts to authenticated;
 grant execute on function is_admin() to anon, authenticated;
+
+-- הרשמה של אדם לפי כיתה ושם (יוצר או מעדכן את הרשומה ושומר טלפון/מייל)
+create or replace function claim_person(p_class int, p_name text, p_phone text, p_email text, p_rsvp text)
+returns void language plpgsql security definer as $$
+declare pid bigint;
+begin
+  if auth.uid() is null then raise exception 'login required'; end if;
+  insert into people(class_no, class_label, name, in_group, match, rsvp, claimed_by)
+  values (p_class, 'יב' || p_class, p_name, true, 'sure', p_rsvp, auth.uid())
+  on conflict (class_no, name) do update
+    set claimed_by = auth.uid(), match = 'sure', in_group = true, rsvp = p_rsvp, updated_at = now()
+    where people.claimed_by is null or people.claimed_by = auth.uid()
+  returning id into pid;
+  if pid is null then raise exception 'already claimed'; end if;
+  insert into contacts(person_id, phone, email) values (pid, p_phone, p_email)
+  on conflict (person_id) do update set phone = excluded.phone, email = excluded.email;
+end $$;
+grant execute on function claim_person(int, text, text, text, text) to authenticated;
