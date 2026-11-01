@@ -2,11 +2,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getPeople } from '@/lib/data';
 import { searchPeople } from '@/lib/search';
+import { useAuth } from '@/components/auth';
 
 const toIntl = (p) => { const d = (p || '').replace(/\D/g, ''); return d.startsWith('972') ? d : d.startsWith('0') ? '972' + d.slice(1) : d; };
 const STATE = { sure: ['בפנים', 'var(--sure)'], maybe: ['צריך לאשר', 'var(--maybe)'], none: ['עוד לא מצאנו', 'var(--none)'] };
 
 export default function Invite() {
+  const { status } = useAuth();
+  useEffect(() => { if (status === 'anon' || status === 'pending') window.location.replace('/join'); }, [status]);
   const [people, setPeople] = useState([]);
   const [q, setQ] = useState('');
   const [pick, setPick] = useState(null);
@@ -18,6 +21,7 @@ export default function Invite() {
     const text = `היי ${first(pick)}, אנחנו מארגנים ערב מחזור בן גוריון 2005 באזור אפריל בנס ציונה. כנסו לוודא שאתם ברשימה: ${location.origin}/join`;
     window.open(`https://wa.me/${toIntl(phone)}?text=${encodeURIComponent(text)}`, '_blank');
   };
+  if (status !== 'member' && status !== 'admin') return null;
   return (
     <main><section className="card" style={{ marginTop: 18 }}>
       <h2>הזמינו חבר מהשכבה</h2>
