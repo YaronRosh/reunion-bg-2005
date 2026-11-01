@@ -43,9 +43,9 @@ export function Dashboard({ t, by }) {
       <div className="dash">
         <Ring t={t} />
         <div className="legend">
-          <div className="leg"><span className="dot" style={{ background: COLORS.sure }} /><b>{t.sure}</b><em>זוהו בביטחון</em></div>
-          <div className="leg"><span className="dot" style={{ background: COLORS.maybe }} /><b>{t.maybe}</b><em>לא בטוחים, צריך לאשר</em></div>
-          <div className="leg"><span className="dot" style={{ background: COLORS.none }} /><b>{t.none}</b><em>עדיין לא מצאנו</em></div>
+          <div className="leg"><span className="dot" style={{ background: COLORS.sure }} /><b>{t.sure}</b><em>זוהו</em></div>
+          <div className="leg"><span className="dot" style={{ background: COLORS.maybe }} /><b>{t.maybe}</b><em>צריך לאשר</em></div>
+          <div className="leg"><span className="dot" style={{ background: COLORS.none }} /><b>{t.none}</b><em>עוד לא מצאנו</em></div>
         </div>
       </div>
       <div className="classes" style={{ marginTop: 22 }}>

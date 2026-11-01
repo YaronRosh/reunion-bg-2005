@@ -49,7 +49,7 @@ drop policy if exists ann_admin on announcements;
 create policy ann_admin on announcements for all to authenticated using (is_admin()) with check (is_admin());
 
 insert into announcements (title, body, pinned)
-select 'שומרים את התאריך', 'ערב מחזור באזור אפריל, באולם אירועים בנס ציונה. פרטים נוספים בהמשך, ממשיכים לחפש את כולם.', true
+select 'אפריל, נס ציונה', 'ערב מחזור באולם אירועים בעיר. תאריך ומקום סופיים יפורסמו כאן. עד אז, עזרו לנו למצוא את כולם.', true
 where not exists (select 1 from announcements);
 
 -- הרשאות ל-Data API (בטוח גם אם "expose new tables" כבוי); ה-RLS למעלה הוא שמגביל בפועל
