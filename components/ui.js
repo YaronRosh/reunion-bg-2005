@@ -36,7 +36,7 @@ export function Ring({ t }) {
   const a = t.total ? (t.sure / t.total) * 360 : 0;
   const b = t.total ? a + (t.maybe / t.total) * 360 : 0;
   const bg = `conic-gradient(var(--sure) 0 ${a}deg, var(--maybe) ${a}deg ${b}deg, var(--none) ${b}deg 360deg)`;
-  return <div className="ring" style={{ background: bg }} role="img" aria-label={`זוהו ${pct} אחוז`}><span>{pct}%<small>זוהו</small></span></div>;
+  return <div className="ring" style={{ background: bg }} role="img" aria-label={`מצאנו ${pct} אחוז`}><span>{pct}%<small>מצאנו</small></span></div>;
 }
 
 export function Stack({ c }) {
@@ -51,9 +51,9 @@ export function Dashboard({ t, by }) {
       <div className="dash">
         <Ring t={t} />
         <div className="legend">
-          <div className="leg"><span className="dot" style={{ background: COLORS.sure }} /><b>{t.sure}</b><em>זוהו</em></div>
-          <div className="leg"><span className="dot" style={{ background: COLORS.maybe }} /><b>{t.maybe}</b><em>צריך לאשר</em></div>
-          <div className="leg"><span className="dot" style={{ background: COLORS.none }} /><b>{t.none}</b><em>עוד לא מצאנו</em></div>
+          <Link href="/list?s=sure" className="leg"><span className="dot" style={{ background: COLORS.sure }} /><b>{t.sure}</b><em>מצאנו</em></Link>
+          <Link href="/list?s=maybe" className="leg"><span className="dot" style={{ background: COLORS.maybe }} /><b>{t.maybe}</b><em>צריך לאשר</em></Link>
+          <Link href="/list?s=none" className="leg"><span className="dot" style={{ background: COLORS.none }} /><b>{t.none}</b><em>עוד לא מצאנו</em></Link>
         </div>
       </div>
       <div className="classes" style={{ marginTop: 22 }}>
@@ -67,9 +67,9 @@ export function Dashboard({ t, by }) {
                 <span className="pct">{s.total ? Math.round((s.sure / s.total) * 100) : 0}%</span>
               </button>
               {open === c.no && <div className="clsd">
-                <div><span className="dot" style={{ background: COLORS.sure }} /><b>{s.sure}</b><em>זוהו</em></div>
-                <div><span className="dot" style={{ background: COLORS.maybe }} /><b>{s.maybe}</b><em>צריך לאשר</em></div>
-                <div><span className="dot" style={{ background: COLORS.none }} /><b>{s.none}</b><em>עוד לא מצאנו</em></div>
+                <Link href={`/list?s=sure&c=${c.no}`}><span className="dot" style={{ background: COLORS.sure }} /><b>{s.sure}</b><em>מצאנו</em></Link>
+                <Link href={`/list?s=maybe&c=${c.no}`}><span className="dot" style={{ background: COLORS.maybe }} /><b>{s.maybe}</b><em>צריך לאשר</em></Link>
+                <Link href={`/list?s=none&c=${c.no}`}><span className="dot" style={{ background: COLORS.none }} /><b>{s.none}</b><em>עוד לא מצאנו</em></Link>
                 <small>סה״כ {s.total} בכיתה</small>
               </div>}
             </div>

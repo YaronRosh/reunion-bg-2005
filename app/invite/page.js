@@ -14,7 +14,7 @@ export default function Invite() {
   const [q, setQ] = useState('');
   const [pick, setPick] = useState(null);
   const [phone, setPhone] = useState('');
-  useEffect(() => { getPeople().then(setPeople); }, []);
+  useEffect(() => { getPeople().then((l) => { setPeople(l); const u = new URLSearchParams(location.search); const f = l.find((x) => x.class_no === +u.get('c') && x.name === u.get('n')); if (f) setPick(f); }); }, []);
   const res = useMemo(() => searchPeople(people, q, 12), [people, q]);
   const first = (p) => p.name.split(' ').slice(-1)[0];
   const send = () => {

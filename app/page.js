@@ -50,7 +50,7 @@ export default function Home() {
       {inside && <section>
         <div className="card">
           <h2>מי כבר כאן, ומי עוד חסר</h2>
-          <p className="sub">{people ? `${t.total} אנשים בעשר כיתות, ${t.sure} כבר זוהו. כל שם שתמצאו הוא עוד אחד שיגיע.` : 'טוען...'}</p>
+          <p className="sub">{people ? `${t.total} אנשים בעשר כיתות, ${t.sure} כבר מצאנו. כל שם שתמצאו הוא עוד אחד שיגיע.` : 'טוען...'}</p>
           {people && <Dashboard t={t} by={by} />}
           <div className="row" style={{ marginTop: 20 }}>
             <button className="btn" onClick={share}>שלחו לחבר מהשכבה</button>

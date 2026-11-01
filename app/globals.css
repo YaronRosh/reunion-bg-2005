@@ -117,3 +117,12 @@ button.cls[aria-expanded=true] .bar{outline:2px solid var(--gold);outline-offset
 .clsd{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:2px 0 14px;text-align:center}
 .clsd div{display:grid;justify-items:center;gap:2px;background:var(--ink-3);border-radius:12px;padding:10px 4px}
 .clsd b{font:800 22px var(--display)} .clsd em{font-style:normal;font-size:12px;opacity:.8} .clsd small{grid-column:1/-1;opacity:.7}
+
+a.leg{color:inherit;text-decoration:none;border-radius:12px} a.leg:active{opacity:.7}
+.clsd a{color:inherit;text-decoration:none} .clsd a:active{opacity:.7}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.tabs button{min-height:46px;border-radius:12px;border:1.5px solid var(--line);background:var(--ink);color:var(--paper);font:700 14px var(--body);cursor:pointer}
+.tabs button[aria-pressed=true]{background:var(--gold);color:var(--gold-ink);border-color:var(--gold)}
+.lrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.lrow small{color:var(--muted);margin-inline-start:8px}
+.lrow .btn{min-height:40px;padding:0 16px;font-size:14px}
