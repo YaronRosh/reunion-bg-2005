@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { getPeople, getUser, sendCode, verifyCode, claimPerson, myPerson } from '@/lib/data';
+import { getPeople, getUser, sendCode, claimPerson, myPerson, onAuth } from '@/lib/data';
 import { searchPeople } from '@/lib/search';
 import { CLASSES, RSVP } from '@/lib/classes';
 
@@ -19,22 +19,18 @@ export default function Join() {
   const [rsvp, setRsvp] = useState('maybe');
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => { (async () => {
-    setPeople(await getPeople());
+  const refresh = async () => {
     const u = await getUser(); setUser(u);
     if (u) { setEmail(u.email); const me = await myPerson(u); setStep(me ? 5 : 3); if (me) setPick(me); }
-  })(); }, []);
+  };
+  useEffect(() => { getPeople().then(setPeople); refresh(); const off = onAuth(refresh); window.addEventListener('focus', refresh); return () => { off(); window.removeEventListener('focus', refresh); }; }, []);
 
   const pool = useMemo(() => people.filter((p) => !p.claimed_by && (!cls || p.class_no === +cls)), [people, cls]);
   const results = useMemo(() => searchPeople(pool, q), [pool, q]);
 
   async function send(e) { e.preventDefault(); setBusy(true); setErr('');
     const r = await sendCode(email.trim()); setBusy(false);
-    if (r.error) setErr('לא הצלחנו לשלוח קוד. בדקו את כתובת המייל.'); else setStep(2); }
-  async function verify(e) { e.preventDefault(); setBusy(true); setErr('');
-    const r = await verifyCode(email.trim(), code.trim()); setBusy(false);
-    if (r.error) { setErr('הקוד לא נכון או שפג תוקפו. נסו שוב.'); return; }
-    setUser(await getUser()); setStep(3); }
+    if (r.error) setErr('לא הצלחנו לשלוח. בדקו את כתובת המייל.'); else if (r.demo) refresh(); else setStep(2); }
   async function save(e) { e.preventDefault(); setBusy(true); setErr('');
     const r = await claimPerson(pick, user, { phone, email, rsvp }); setBusy(false);
     if (r.error) setErr('מישהו כבר זיהה את השם הזה. כתבו למארגנים ונסדר.'); else setStep(5); }
@@ -44,26 +40,23 @@ export default function Join() {
       <div className="steps" aria-hidden="true">{[1, 2, 3, 4, 5].map((i) => <i key={i} className={i <= step ? 'on' : ''} />)}</div>
 
       {step === 1 && <form onSubmit={send}>
-        <h2>מי אתם מהשכבה?</h2>
-        <p className="sub">נכניס אתכם עם קוד קצר במייל, בלי סיסמה. כך אנחנו יודעים שזה באמת אתם.</p>
+        <h2>התחברות לפי מייל</h2>
+        <p className="sub">נשלח לכם קישור כניסה, בלי סיסמה. אחרי הכניסה תמצאו את השם שלכם ברשימה.</p>
         <label htmlFor="email">אימייל</label>
         <input id="email" type="email" inputMode="email" autoComplete="email" dir="ltr" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" />
         {err && <p className="err">{err}</p>}
-        <div className="row" style={{ marginTop: 18 }}><button className="btn" disabled={busy}>שלחו לי קוד</button></div>
+        <div className="row" style={{ marginTop: 18 }}><button className="btn" disabled={busy}>שלחו לי קישור</button></div>
       </form>}
 
-      {step === 2 && <form onSubmit={verify}>
-        <h2>הקוד בדרך</h2>
-        <p className="sub">שלחנו קוד ל-{email}. בהדגמה אפשר להקליד כל קוד.</p>
-        <label htmlFor="code">קוד</label>
-        <input id="code" inputMode="numeric" autoComplete="one-time-code" dir="ltr" required value={code} onChange={(e) => setCode(e.target.value)} />
-        {err && <p className="err">{err}</p>}
-        <div className="row" style={{ marginTop: 18 }}><button className="btn" disabled={busy}>המשיכו</button></div>
-      </form>}
+      {step === 2 && <div>
+        <h2>בדקו את המייל</h2>
+        <p className="sub">שלחנו קישור כניסה ל-<b dir="ltr">{email}</b>. לחצו עליו (גם בטלפון) ותחזרו לכאן אוטומטית, מחוברים. לא הגיע? בדקו בספאם.</p>
+        <div className="row"><button className="btn ghost" onClick={() => setStep(1)}>מייל אחר</button><button className="btn ghost" onClick={send}>שלחו שוב</button></div>
+      </div>}
 
       {step === 3 && <div>
-        <h2>מצאו את השם שלכם</h2>
-        <p className="sub">כתבו שם משפחה או שם פרטי, בכל סדר.</p>
+        <h2>מחוברים. עכשיו, מי אתם?</h2>
+        <p className="sub">כתבו שם משפחה או שם פרטי, בכל סדר, ובחרו את עצמכם מהרשימה.</p>
         <label htmlFor="cls">כיתה (לא חובה)</label>
         <select id="cls" value={cls} onChange={(e) => setCls(e.target.value)}>
           <option value="">כל הכיתות</option>

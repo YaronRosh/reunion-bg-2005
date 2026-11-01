@@ -24,8 +24,8 @@ export default function Home() {
         <h1>נפגשים באפריל.<br />כולם.</h1>
         <p className="lede">ערב אחד עם האנשים שישבו איתכם בכיתה. מוזיקה, כוסית, נוסטלגיה, ותמונת המחזור על המסך. התאריך והאולם נסגרים בקרוב.</p>
         <div className="row">
-          <Link href="/join" className="btn">אני בפנים</Link>
-          <Link href="/invite" className="btn ghost">מי עוד חסר? הביאו אותו</Link>
+          <Link href="/join" className="btn">מצאו את השם שלכם</Link>
+          <Link href="/invite" className="btn ghost">הזמינו חבר מהשכבה</Link>
         </div>
         <ul className="facts"><li><b>10</b>כיתות</li><li><b>{people ? t.total : '·'}</b>חברים ברשימה</li><li><b>1</b>ערב</li></ul>
       </section>

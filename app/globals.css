@@ -89,3 +89,9 @@ footer{padding:36px 0 50px;color:var(--muted);font-size:13px;text-align:center}
 .facts{display:flex;gap:22px;list-style:none;padding:0;margin:26px 0 0;color:var(--muted);font-size:14px}
 .facts li{display:flex;flex-direction:column;gap:2px}.facts b{font-family:var(--display);font-size:26px;color:var(--paper);font-variant-numeric:tabular-nums}
 @media(prefers-reduced-motion:no-preference){.b{animation:float 9s ease-in-out infinite alternate}.b2{animation-duration:12s}.b4{animation-duration:11s;animation-delay:-3s}@keyframes float{to{transform:translate(14px,-18px) scale(1.12)}}}
+.who{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px;color:var(--muted);padding:8px 14px;margin-bottom:6px;border:1px solid var(--line);border-radius:12px;background:var(--ink-2)}
+.who a{color:var(--gold);text-decoration:none;font-weight:700}.who b{color:var(--paper);font-weight:500}
+.who button{background:none;border:0;color:var(--gold);font:700 13px var(--body);cursor:pointer;padding:6px}
+.picked{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0 4px;padding:12px 14px;border-radius:14px;background:var(--ink);border:1.5px solid var(--gold)}
+.picked small{color:var(--muted)}.x{width:36px;height:36px;border-radius:50%;border:0;background:var(--ink-3);color:var(--paper);font-size:22px;cursor:pointer;line-height:1}
+.item:disabled{cursor:default}

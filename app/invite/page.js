@@ -2,43 +2,46 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getPeople } from '@/lib/data';
 import { searchPeople } from '@/lib/search';
-import { RSVP } from '@/lib/classes';
 
 const toIntl = (p) => { const d = (p || '').replace(/\D/g, ''); return d.startsWith('972') ? d : d.startsWith('0') ? '972' + d.slice(1) : d; };
+const STATE = { sure: ['בפנים', 'var(--sure)'], maybe: ['צריך לאשר', 'var(--maybe)'], none: ['עוד לא מצאנו', 'var(--none)'] };
 
 export default function Invite() {
   const [people, setPeople] = useState([]);
   const [q, setQ] = useState('');
-  const [only, setOnly] = useState(true);
   const [pick, setPick] = useState(null);
   const [phone, setPhone] = useState('');
   useEffect(() => { getPeople().then(setPeople); }, []);
-  const pool = useMemo(() => people.filter((p) => (only ? p.match !== 'sure' : true)), [people, only]);
-  const res = useMemo(() => searchPeople(pool, q), [pool, q]);
+  const res = useMemo(() => searchPeople(people, q, 12), [people, q]);
+  const first = (p) => p.name.split(' ').slice(-1)[0];
   const send = () => {
-    const text = `היי ${pick.name.split(' ').slice(-1)[0]}, אנחנו מארגנים ערב מחזור בן גוריון 2005 באזור אפריל בנס ציונה. נכנסים לוודא שאתם ברשימה: ${location.origin}/join`;
+    const text = `היי ${first(pick)}, אנחנו מארגנים ערב מחזור בן גוריון 2005 באזור אפריל בנס ציונה. כנסו לוודא שאתם ברשימה: ${location.origin}/join`;
     window.open(`https://wa.me/${toIntl(phone)}?text=${encodeURIComponent(text)}`, '_blank');
   };
   return (
     <main><section className="card" style={{ marginTop: 18 }}>
-      <h2>הביאו חבר מהשכבה</h2>
-      <p className="sub">מצאו מישהו שאתם מכירים ועוד לא זוהה, והודעה מוכנה תיפתח לכם בווטסאפ. שום מספר לא נשמר אצלנו.</p>
-      <div className="tabs">
-        <button className="pill" aria-pressed={only} onClick={() => setOnly(true)}>רק מי שעוד לא זוהה</button>
-        <button className="pill" aria-pressed={!only} onClick={() => setOnly(false)}>כולם</button>
-      </div>
+      <h2>הזמינו חבר מהשכבה</h2>
+      <p className="sub">חפשו שם, בחרו אותו, והודעה מוכנה תיפתח לכם בווטסאפ. שום מספר לא נשמר אצלנו. מי שכבר בפנים מסומן בירוק.</p>
+
+      {pick && <div className="picked">
+        <div><b>{pick.name}</b><small> · יב{pick.class_no}</small></div>
+        <button className="x" aria-label="הסרת הבחירה" onClick={() => { setPick(null); setPhone(''); }}>×</button>
+      </div>}
+
       {!pick ? <>
         <label htmlFor="q">חיפוש שם</label>
-        <input id="q" value={q} onChange={(e) => setQ(e.target.value)} placeholder="שם משפחה או שם פרטי" />
-        <div className="list">{res.map((p) => <button key={p.id} className="item" onClick={() => setPick(p)}><span>{p.name}</span><small>יב{p.class_no}</small></button>)}
-          {q && !res.length && <p className="hint">אין התאמה. ייתכן שהוא כבר מזוהה.</p>}</div>
+        <input id="q" value={q} onChange={(e) => setQ(e.target.value)} placeholder="שם משפחה או שם פרטי" autoFocus />
+        <div className="list">{res.map((p) => { const [t, c] = STATE[p.match]; const done = p.match === 'sure';
+          return <button key={p.id} className="item" disabled={done} onClick={() => setPick(p)} style={done ? { opacity: .7, cursor: 'default' } : undefined}>
+            <span>{p.name}<small style={{ marginInlineStart: 8 }}>יב{p.class_no}</small></span>
+            <span className="chip" style={{ color: c, background: 'transparent', border: `1px solid ${c}` }}>{done ? '✓ ' : ''}{t}</span></button>; })}
+          {q && !res.length && <p className="hint">אין התאמה. נסו שם אחר.</p>}</div>
       </> : <>
-        <h3>{pick.name} · יב{pick.class_no}</h3>
-        <label htmlFor="ph">הטלפון שלו</label>
-        <input id="ph" type="tel" inputMode="tel" dir="ltr" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="050-0000000" />
+        <label htmlFor="ph">הטלפון של {first(pick)}</label>
+        <input id="ph" type="tel" inputMode="tel" dir="ltr" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0528449959" autoFocus />
         <div className="row" style={{ marginTop: 18 }}>
-          <button className="btn" disabled={toIntl(phone).length < 11} onClick={send}>שלחו בווטסאפ</button>
-          <button className="btn ghost" onClick={() => { setPick(null); setPhone(''); }}>אחר</button>
+          <button className="btn" disabled={toIntl(phone).length < 11} onClick={send}>פתחו הודעה בווטסאפ</button>
+          <button className="btn ghost" onClick={() => { setPick(null); setPhone(''); }}>בחרו מישהו אחר</button>
         </div>
       </>}
     </section></main>

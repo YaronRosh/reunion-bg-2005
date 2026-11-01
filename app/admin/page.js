@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { getUser, sendCode, verifyCode, isAdmin, getPeople, getAnnouncements, postAnnouncement, deleteAnnouncement, importRows, signOut } from '@/lib/data';
+import { getUser, sendCode, isAdmin, getPeople, getAnnouncements, postAnnouncement, deleteAnnouncement, importRows, signOut } from '@/lib/data';
 import { parseCsv, toPeople } from '@/lib/csv';
 import { CLASSES } from '@/lib/classes';
 import { DEMO } from '@/lib/supabase';
@@ -22,13 +22,11 @@ export default function Admin() {
   if (!user) return (
     <main><section className="card" style={{ marginTop: 18 }}>
       <h2>כניסה למארגנים</h2>
-      <label htmlFor="e">אימייל</label>
-      <input id="e" type="email" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} />
-      {sent && <><label htmlFor="c">קוד</label><input id="c" dir="ltr" value={code} onChange={(e) => setCode(e.target.value)} /></>}
-      <div className="row" style={{ marginTop: 16 }}>
-        {!sent ? <button className="btn" onClick={async () => { await sendCode(email); setSent(true); }}>שלחו קוד</button>
-          : <button className="btn" onClick={async () => { await verifyCode(email, code); const u = await getUser(); setUser(u); setOk(await isAdmin(u)); load(); }}>כניסה</button>}
-      </div>
+      {!sent ? <>
+        <label htmlFor="e">אימייל</label>
+        <input id="e" type="email" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <div className="row" style={{ marginTop: 16 }}><button className="btn" onClick={async () => { const r = await sendCode(email.trim(), '/admin'); if (r.demo) { setUser(await getUser()); setOk(true); load(); } else setSent(true); }}>שלחו לי קישור</button></div>
+      </> : <p className="sub">שלחנו קישור כניסה ל-<b dir="ltr">{email}</b>. לחצו עליו ותחזרו לכאן מחוברים.</p>}
     </section></main>);
   if (!ok) return <main><section className="card" style={{ marginTop: 18 }}><h2>אין הרשאת מארגן</h2><p className="sub">המשתמש {user.email} לא ברשימת המארגנים. בקשו מיורון להוסיף.</p></section></main>;
 
