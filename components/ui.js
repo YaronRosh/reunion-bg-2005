@@ -9,10 +9,10 @@ import { useAuth } from '@/components/auth';
 
 export function Shell({ children }) {
   const path = usePathname();
-  const { status, user: me } = useAuth();
+  const { status, user: me, person } = useAuth();
   const admin = status === 'admin';
   const inside = status === 'member' || admin;
-  const links = inside ? [['/', 'בית'], ['/invite', 'הזמנת חברים'], ...(admin ? [['/admin', 'מארגנים']] : [])] : [['/', 'בית'], ['/join', 'התחברות']];
+  const links = inside ? [['/', 'בית'], ['/invite', 'הזמנת חברים'], ...(admin ? [['/admin', 'מארגנים']] : [])] : [['/', 'בית'], ['/join', 'מצאו אותי']];
   return (
     <div className="wrap">
       <header className="nav">
@@ -21,7 +21,7 @@ export function Shell({ children }) {
           {links.map(([h, t]) => <Link key={h} href={h} aria-current={path === h ? 'page' : undefined}>{t}</Link>)}
         </nav>
       </header>
-      <div className="who">{me ? <><span>מחובר: <b dir="ltr">{me.email}</b></span><button onClick={async () => { await signOut(); location.href = '/'; }}>יציאה</button></> : <Link href="/join">לא מחוברים. התחברות</Link>}</div>
+      <div className="who">{me ? <><span>{person ? <>נרשמתם כ-<b>{person.name}</b> · יב{person.class_no}</> : <>מחובר: <b dir="ltr">{me.email || 'אורח'}</b></>}</span><button onClick={async () => { await signOut(); location.href = '/'; }}>יציאה</button></> : <Link href="/join">עוד לא נרשמתם? מצאו את השם שלכם</Link>}</div>
       {DEMO && <p className="hint" style={{ textAlign: 'center' }}>מצב הדגמה: הנתונים כאן לדוגמה בלבד.</p>}
       {children}
       <footer>מחזור 2005 · בן גוריון · נס ציונה</footer>

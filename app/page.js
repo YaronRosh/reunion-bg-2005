@@ -27,7 +27,7 @@ export default function Home() {
         <h1>נפגשים באפריל.<br />כולם.</h1>
         <p className="lede">ערב אחד עם האנשים שישבו איתכם בכיתה. מוזיקה, כוסית, נוסטלגיה, ותמונת המחזור על המסך. התאריך והאולם נסגרים בקרוב.</p>
         <div className="row">
-          {inside ? <Link href="/invite" className="btn">הזמינו חבר מהשכבה</Link> : <Link href="/join" className="btn">{status === 'pending' ? 'בחרו את השם שלכם' : 'התחברו ומצאו את השם שלכם'}</Link>}
+          {inside ? <Link href="/invite" className="btn">הזמינו חבר מהשכבה</Link> : <Link href="/join" className="btn">{status === 'pending' ? 'בחרו את השם שלכם' : 'מצאו את השם שלכם'}</Link>}
         </div>
         <ul className="facts"><li><b>10</b>כיתות</li><li><b>{people ? t.total : '339'}</b>חברים ברשימה</li><li><b>1</b>ערב</li></ul>
       </section>
@@ -39,7 +39,7 @@ export default function Home() {
         </div></section>
       ))}
 
-      {!inside && status !== 'loading' && <section><div className="card"><h2>האתר פתוח לבוגרי המחזור</h2><p className="sub">כדי לראות מי כבר כאן, מי עוד חסר ומה קורה בערב, מתחברים עם המייל ובוחרים את השם שלכם מהרשימה. כך אנחנו יודעים שזה באמת אתם.</p><Link href="/join" className="btn">להתחברות</Link></div></section>}
+      {!inside && status !== 'loading' && <section><div className="card"><h2>האתר פתוח לבוגרי המחזור</h2><p className="sub">כדי לראות מי כבר כאן, מי עוד חסר ומה קורה בערב, מוצאים את השם שלכם ברשימה ומשאירים טלפון. זה לוקח חצי דקה.</p><Link href="/join" className="btn">מצאו את השם שלכם</Link></div></section>}
 
       {inside && <section>
         <div className="card">
