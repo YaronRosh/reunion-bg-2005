@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { getUser, sendCode, verifyCode, isAdmin, getPeople, getAnnouncements, postAnnouncement, deleteAnnouncement, importRows, signOut } from '@/lib/data';
 import { parseCsv, toPeople } from '@/lib/csv';
 import { CLASSES } from '@/lib/classes';
+import { DEMO } from '@/lib/supabase';
 
 export default function Admin() {
   const [user, setUser] = useState(undefined);
@@ -34,6 +35,13 @@ export default function Admin() {
   return (
     <main>
       <section className="card" style={{ marginTop: 18 }}>
+        <h2>סטטוס מערכת</h2>
+        <p className="sub">{DEMO ? 'לא מחובר למסד נתונים (מצב הדגמה).' : `מחובר למסד הנתונים. ${people.length} אנשים טעונים.`}</p>
+        <div className="row"><button className="btn" onClick={async () => { const rows = await (await fetch('/seed.json')).json(); const res = await importRows(rows); setMsg(res.error ? 'שגיאה: ' + res.error : `נטענו ${rows.length} אנשים`); load(); }}>טענו את כל הרשימה מהגיליון</button></div>
+        {msg && <p className="hint">{msg}</p>}
+      </section>
+
+      <section className="card">
         <h2>הודעה חדשה</h2>
         <label htmlFor="t">כותרת</label><input id="t" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} />
         <label htmlFor="b">תוכן</label><textarea id="b" value={f.body} onChange={(e) => setF({ ...f, body: e.target.value })} />
