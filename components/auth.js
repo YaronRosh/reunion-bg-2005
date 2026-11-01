@@ -8,10 +8,12 @@ export function useAuth() {
   useEffect(() => {
     let live = true;
     const load = async () => {
-      const user = await getUser();
-      if (!user) return live && setS({ status: 'anon', user: null, person: null });
-      const [admin, person] = await Promise.all([isAdmin(user), myPerson(user)]);
-      live && setS({ status: admin ? 'admin' : person ? 'member' : 'pending', user, person });
+      try {
+        const user = await getUser();
+        if (!user) return live && setS({ status: 'anon', user: null, person: null });
+        const [admin, person] = await Promise.all([isAdmin(user).catch(() => false), myPerson(user).catch(() => null)]);
+        live && setS({ status: admin ? 'admin' : person ? 'member' : 'pending', user, person });
+      } catch { live && setS({ status: 'anon', user: null, person: null }); }
     };
     load();
     const off = onAuth(load);
