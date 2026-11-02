@@ -1,4 +1,4 @@
-// מסנכרן טלפון ואימייל של נרשמי האתר ישר ללשוניות הכיתות (יב1..יב10):
+// מסנכרן טלפון ואימייל (למעלה) ומארגנים (עמודה I = V)  של נרשמי האתר ישר ללשוניות הכיתות (יב1..יב10):
 // טלפון -> עמודה E, אימייל -> עמודה H. לא נוגע בשאר העמודות.
 const SUPABASE_URL = 'PUT_URL';
 const SUPABASE_KEY = 'PUT_ANON_KEY';
@@ -13,10 +13,14 @@ function sync() {
   if (res.getResponseCode() !== 200) throw new Error(res.getContentText());
   const rows = JSON.parse(res.getContentText());
   const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const orgs = [];
   const norm = (s) => String(s || '').replace(/\s+/g, ' ').trim();
   for (let c = 1; c <= 10; c++) {
     const sh = ss.getSheetByName('יב' + c);
     if (!sh) continue;
+    const flags = sh.getRange(2, 9, Math.max(sh.getLastRow() - 1, 1), 1).getValues();
+    const nm = sh.getRange(2, 1, Math.max(sh.getLastRow() - 1, 1), 1).getValues();
+    nm.forEach((r, i) => { if (String(flags[i][0]).trim().toUpperCase() === 'V' && r[0]) orgs.push({ class_no: c, name: norm(r[0]) }); });
     const mine = rows.filter((r) => r.class_no === c);
     if (!mine.length) continue;
     const last = Math.max(sh.getLastRow(), 2);
@@ -37,4 +41,9 @@ function sync() {
     sh.getRange(2, 5, phones.length, 1).setValues(phones);
     sh.getRange(2, 8, mails.length, 1).setValues(mails);
   }
+  UrlFetchApp.fetch(SUPABASE_URL + '/rest/v1/rpc/sync_organizers', {
+    method: 'post', contentType: 'application/json',
+    headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY },
+    payload: JSON.stringify({ p_code: ORG_CODE, p_list: orgs }), muteHttpExceptions: true,
+  });
 }
