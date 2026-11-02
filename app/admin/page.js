@@ -33,7 +33,7 @@ export default function Admin() {
 
       <section className="card">
         <h2>סנכרון לאקסל</h2>
-        <p className="sub">הקלידו את קוד המארגנים, העתיקו, והדביקו בגיליון: Extensions → Apps Script. אחר כך הריצו sync פעם אחת, והגדירו Trigger כל 10 דקות. ההרשמות, הטלפונים והמיילים יופיעו בלשונית "רישום מהאתר".</p>
+        <p className="sub">הקלידו את קוד המארגנים, העתיקו, והדביקו בגיליון: Extensions → Apps Script. אחר כך הריצו sync פעם אחת, והגדירו Trigger כל 10 דקות. ההרשמות, הטלפונים והמיילים יופיעו בלשוניות הכיתות (טלפון בעמודה E, אימייל בעמודה H).</p>
         <input dir="ltr" value={code} onChange={(e) => setCode(e.target.value)} placeholder="קוד מארגנים" autoComplete="off" />
         <div className="row" style={{ marginTop: 12 }}><button className="btn" disabled={!code} onClick={async () => {
           const t = await (await fetch('/sheet-sync.gs')).text();
