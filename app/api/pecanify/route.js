@@ -16,14 +16,22 @@ async function myRow(token) {
   return rows[0] || null;
 }
 
+const firstArray = (j) => {
+  if (Array.isArray(j)) return j;
+  for (const v of Object.values(j || {})) { const r = Array.isArray(v) ? v : v && typeof v === 'object' ? firstArray(v) : null; if (r) return r; }
+  return [];
+};
+let lastDiag = '';
 async function allCards() {
   const out = [];
   for (let page = 0; page < 10; page++) {
-    const r = await fetch(`${BASE}/search`, { method: 'POST', headers: H(), body: JSON.stringify({ sort: [{ field: 'name', order: 'ASC' }], limit: 500, offset: page * 500, filter: {} }) });
-    const j = await r.json();
-    const list = Array.isArray(j) ? j : j.data || j.items || j.cards || [];
+    const r = await fetch(`${BASE}/search`, { method: 'POST', headers: H(), body: JSON.stringify({ sort: [{ field: 'name', order: 'ASC' }], limit: 250, offset: page * 250, filter: {} }) });
+    const txt = await r.text();
+    let j = {}; try { j = JSON.parse(txt); } catch {}
+    const list = firstArray(j);
+    if (page === 0) lastDiag = `search ${r.status} items=${list.length} ${list.length ? '' : txt.slice(0, 200)}`;
     out.push(...list);
-    if (list.length < 500) break;
+    if (list.length < 250) break;
   }
   return out;
 }
@@ -43,7 +51,7 @@ export async function POST(req) {
     const me = await myRow(token);
     if (!me) return fail('unauthorized', 401);
     const card = await findCard(me);
-    if (!card) return fail('card not found', 404);
+    if (!card) return fail(`card not found (${me.name}) ${lastDiag}`, 404);
     if (action === 'get') {
       return Response.json({ ok: true, phone: card.phone || '', email: card.email || '', occupation: card.customFields?.career || '' });
     }
