@@ -11,7 +11,9 @@ async function myRow(token) {
   const u = await fetch(`${url}/auth/v1/user`, { headers: { apikey: anon, Authorization: `Bearer ${token}` } });
   if (!u.ok) return null;
   const { id } = await u.json();
-  const r = await fetch(`${url}/rest/v1/people?claimed_by=eq.${id}&select=name,class_no&limit=1`, { headers: { apikey: anon, Authorization: `Bearer ${token}` } });
+  const hdr = { apikey: anon, Authorization: `Bearer ${token}` };
+  let r = await fetch(`${url}/rest/v1/people?claimed_by=eq.${id}&select=name,class_no,crm_id&limit=1`, { headers: hdr });
+  if (!r.ok) r = await fetch(`${url}/rest/v1/people?claimed_by=eq.${id}&select=name,class_no&limit=1`, { headers: hdr }); // עמודת crm_id עוד לא קיימת
   const rows = r.ok ? await r.json() : [];
   return rows[0] || null;
 }
@@ -45,6 +47,10 @@ async function byName(name) {
   return list;
 }
 async function findCard(me) {
+  if (me.crm_id) {
+    const r = await fetch(`${BASE}/${me.crm_id}`, { headers: H() });
+    if (r.ok) { const j = await r.json(); const c = j.data || j; if (c && c.id) return c; }
+  }
   const hit = await byName(me.name);
   const ok = hit.filter((c) => norm(c.name) === norm(me.name));
   if (ok.length) return ok.find((c) => String(c.customFields?.class ?? c.class) === String(me.class_no)) || ok[0];
