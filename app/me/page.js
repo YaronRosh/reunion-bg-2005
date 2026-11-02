@@ -7,6 +7,7 @@ import { useAuth } from '@/components/auth';
 export default function Me() {
   const auth = useAuth();
   const [f, setF] = useState({ phone: '', email: '', occupation: '' });
+  const [detail, setDetail] = useState('');
   const [state, setState] = useState('loading'); // loading | ready | saving | saved | error
   const inside = auth.status === 'member' || auth.status === 'admin';
 
@@ -18,7 +19,7 @@ export default function Me() {
   async function save(e) {
     e.preventDefault(); setState('saving');
     const r = await crm('set', { phone: normPhone(f.phone), email: f.email.trim(), occupation: f.occupation.trim() });
-    setState(r.ok ? 'saved' : 'error');
+    setDetail(r.detail || r.error || ''); setState(r.ok ? 'saved' : 'error');
   }
   const set = (k) => (e) => { setF({ ...f, [k]: e.target.value }); setState('ready'); };
 
@@ -37,7 +38,7 @@ export default function Me() {
         <p className="hint">תמיד טוב לדעת אם יש רופא בקהל, או דיג'יי 😉</p>
         <button className="btn" disabled={state === 'saving' || state === 'loading'}>{state === 'saving' ? 'שומר...' : 'שמירה'}</button>
         {state === 'saved' && <p className="hint">נשמר ✓</p>}
-        {state === 'error' && <p className="hint">לא הצלחנו לשמור. נסו שוב.</p>}
+        {state === 'error' && <p className="hint">לא הצלחנו לשמור. נסו שוב.<br /><small dir="ltr">{detail}</small></p>}
         <p><Link href="/">חזרה לדשבורד</Link></p>
       </form>
     </main>
