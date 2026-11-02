@@ -20,6 +20,7 @@ export default function Join() {
   const [err, setErr] = useState('');
   const [email, setEmail] = useState('');
   const [mail, setMail] = useState('');
+  const [job, setJob] = useState('');
   const [sent, setSent] = useState(false);
 
   useEffect(() => { getPeople().then(setPeople); }, []);
@@ -41,7 +42,7 @@ export default function Join() {
     e.preventDefault(); setBusy(true); setErr('');
     try {
       const user = await ensureSession();
-      const r = await claimPerson(pick, user, { phone, email: mail.trim(), rsvp });
+      const r = await claimPerson(pick, user, { phone, email: mail.trim(), rsvp, occupation: job.trim() });
       if (r.error) setErr(/already/i.test(r.error) ? 'השם הזה כבר נרשם מהמכשיר של מישהו אחר. אם זה אתם, כתבו למארגנים.' : 'לא הצלחנו לשמור. נסו שוב.'); else { setDone(true); refreshAuth(); }
     } catch { setErr('לא הצלחנו לשמור. נסו שוב.'); }
     setBusy(false);
@@ -94,6 +95,8 @@ export default function Join() {
         <label htmlFor="mail">אימייל</label>
         <input id="mail" type="email" inputMode="email" autoComplete="email" dir="ltr" required value={mail} onChange={(e) => setMail(e.target.value)} placeholder="name@gmail.com" />
         <p className="hint">כדי שנוכל לעדכן אתכם על הערב. גלוי רק למארגנים.</p>
+        <label htmlFor="job">במה אתם עוסקים היום?</label>
+        <input id="job" type="text" autoComplete="organization-title" value={job} onChange={(e) => setJob(e.target.value)} placeholder="למשל: רופאה, מפתח, מורה" />
         {SHOW_RSVP && <>
         <label>האם תגיעו?</label>
         <div className="seg" role="group" aria-label="האם תגיעו">

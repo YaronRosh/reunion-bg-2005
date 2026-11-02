@@ -26,7 +26,7 @@ async function allCards() {
 export async function POST(req) {
   try {
     if (!key()) return Response.json({ ok: false, error: 'no key' }, { status: 500 });
-    const { name, class_no, phone, email, token } = await req.json();
+    const { name, class_no, phone, email, occupation, token } = await req.json();
     if (!name || !(await verifyUser(token))) return Response.json({ ok: false, error: 'unauthorized' }, { status: 401 });
     const cards = await allCards();
     const card = cards.find((c) => norm(c.name) === norm(name) && String(c.customFields?.class ?? c.class ?? class_no) === String(class_no))
@@ -35,6 +35,7 @@ export async function POST(req) {
     const body = { name: card.name };
     if (phone) body.phone = phone;
     if (email) body.email = email;
+    if (occupation) body.customFields = { occupation: String(occupation).slice(0, 200) };
     const r = await fetch(`${BASE}/${card.id}`, { method: 'PUT', headers: H(), body: JSON.stringify(body) });
     return Response.json({ ok: r.ok }, { status: r.ok ? 200 : 502 });
   } catch (e) {
