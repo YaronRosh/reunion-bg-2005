@@ -1,9 +1,6 @@
 // קריאה/כתיבה ל-Pecanify מצד השרת בלבד. המפתח נשמר ב-PECANIFY_API_KEY ב-Vercel.
 // המשתמש יכול לגעת רק בכרטיס של השם שהוא רשם (נבדק מול Supabase עם הטוקן שלו).
-const BASE = 'https://www.pecanify.com/api/public/cards/contacts';
-const key = () => (process.env.PECANIFY_API_KEY || '').replace(/^Bearer\s+/i, '').trim();
-const H = () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${key()}` });
-const norm = (s) => (s || '').replace(/[\s'׳"״]/g, '').toLowerCase();
+import { BASE, H, key, norm, firstArray, allCards, lastDiag } from '@/lib/crm';
 
 async function myRow(token) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL, anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -18,32 +15,13 @@ async function myRow(token) {
   return rows[0] || null;
 }
 
-const firstArray = (j) => {
-  if (Array.isArray(j)) return j;
-  for (const v of Object.values(j || {})) { const r = Array.isArray(v) ? v : v && typeof v === 'object' ? firstArray(v) : null; if (r) return r; }
-  return [];
-};
-let lastDiag = '';
-async function allCards() {
-  // ה-API מחזיר עד 250 בבקשה והדילוג לא מובטח, לכן שולפים פעם בסדר עולה ופעם ביורד ומאחדים
-  const seen = new Map();
-  for (const order of ['ASC', 'DESC']) {
-    const r = await fetch(`${BASE}/search`, { method: 'POST', headers: H(), body: JSON.stringify({ sort: [{ field: 'name', order }], limit: 250, filter: {} }) });
-    const txt = await r.text();
-    let j = {}; try { j = JSON.parse(txt); } catch {}
-    const list = firstArray(j);
-    lastDiag = `search ${r.status} items=${list.length}`;
-    list.forEach((c) => seen.set(c.id, c));
-  }
-  return [...seen.values()];
-}
-
+let diag = '';
 async function byName(name) {
   const r = await fetch(`${BASE}/search`, { method: 'POST', headers: H(), body: JSON.stringify({ sort: [{ field: 'name', order: 'ASC' }], limit: 50, filter: { name: { type: 'TEXT', operator: 'EQUAL', value: name } } }) });
   const txt = await r.text();
   let j = {}; try { j = JSON.parse(txt); } catch {}
   const list = firstArray(j);
-  lastDiag += ` | byName ${r.status} items=${list.length} ${list.length ? '' : txt.slice(0, 150)}`;
+  diag += ` | byName ${r.status} items=${list.length} ${list.length ? '' : txt.slice(0, 150)}`;
   return list;
 }
 async function findCard(me) {
@@ -68,14 +46,14 @@ export async function POST(req) {
     const me = await myRow(token);
     if (!me) return fail('unauthorized', 401);
     const card = await findCard(me);
-    if (!card) return fail(`card not found (${me.name}) ${lastDiag}`, 404);
+    if (!card) return fail(`card not found (${me.name}) ${lastDiag}${diag}`, 404);
     if (action === 'get') {
       return Response.json({ ok: true, phone: card.phone || '', email: card.email || '', occupation: card.customFields?.career || '' });
     }
-    const body = { name: card.name, leadStatus: 'IN_PROGRESS' }; // 'נרשם - בקבוצה'
+    const body = { name: card.name, leadStatus: 'IN_PROGRESS', customFields: { match_status: 'sure', custom_field_jo31: '1' } }; // 'נרשם - בקבוצה'
     if (phone) body.phone = phone;
     if (email) body.email = email;
-    if (occupation != null) body.customFields = { career: String(occupation).slice(0, 200) };
+    if (occupation != null) body.customFields.career = String(occupation).slice(0, 200);
     const r = await fetch(`${BASE}/${card.id}`, { method: 'PUT', headers: H(), body: JSON.stringify(body) });
     const detail = r.ok ? '' : `${r.status} ${(await r.text()).slice(0, 300)}`;
     return Response.json({ ok: r.ok, detail }, { status: r.ok ? 200 : 502 });
