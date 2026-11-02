@@ -113,7 +113,7 @@ export default function Join() {
         {!org ? <button className="pill" onClick={() => setOrg(true)}>אני מארגן/ת</button> : <>
           <label htmlFor="oc">קוד מארגנים</label>
           <input id="oc" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="off" />
-          <div className="row" style={{ marginTop: 12 }}><button className="btn ghost" onClick={async () => { try { await ensureSession(); const ok = await becomeAdmin(email); if (ok) { await refreshAuth(); window.location.href = '/admin'; } else setErr('הקוד לא נכון.'); } catch { setErr('לא הצלחנו. נסו שוב.'); } }}>כניסה</button></div>
+          <div className="row" style={{ marginTop: 12 }}><button className="btn ghost" onClick={async () => { try { await ensureSession(); const ok = await becomeAdmin(email); if (ok) { await refreshAuth(); window.location.href = '/admin'; } else setErr('הקוד לא נכון.'); } catch (e) { setErr('שגיאה: ' + (e?.message || 'לא הצלחנו')); } }}>כניסה</button></div>
           {err && <p className="err">{err}</p>}
         </>}
       </div>}
