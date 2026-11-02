@@ -12,7 +12,7 @@ export function Shell({ children }) {
   const { status, user: me, person } = useAuth();
   const admin = status === 'admin';
   const inside = status === 'member' || admin;
-  const links = inside ? [['/', 'בית'], ['/invite', 'הזמנת חברים'], ...(admin ? [['/admin', 'מארגנים']] : [])] : [['/', 'בית'], ['/join', 'מצאו אותי']];
+  const links = inside ? [['/', 'בית'], ['/invite', 'הזמנת חברים'], ['/me', 'הפרטים שלי'], ...(admin ? [['/admin', 'מארגנים']] : [])] : [['/', 'בית'], ['/join', 'מצאו אותי']];
   return (
     <div className="wrap">
       <header className="nav">
