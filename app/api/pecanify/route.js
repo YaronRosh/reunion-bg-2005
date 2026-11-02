@@ -36,7 +36,18 @@ async function allCards() {
   return out;
 }
 
+async function byName(name) {
+  const r = await fetch(`${BASE}/search`, { method: 'POST', headers: H(), body: JSON.stringify({ sort: [{ field: 'name', order: 'ASC' }], limit: 50, filter: { name: { type: 'TEXT', operator: 'EQUAL', value: name } } }) });
+  const txt = await r.text();
+  let j = {}; try { j = JSON.parse(txt); } catch {}
+  const list = firstArray(j);
+  lastDiag += ` | byName ${r.status} items=${list.length} ${list.length ? '' : txt.slice(0, 150)}`;
+  return list;
+}
 async function findCard(me) {
+  const hit = await byName(me.name);
+  const ok = hit.filter((c) => norm(c.name) === norm(me.name));
+  if (ok.length) return ok.find((c) => String(c.customFields?.class ?? c.class) === String(me.class_no)) || ok[0];
   const cards = await allCards();
   const same = cards.filter((c) => norm(c.name) === norm(me.name));
   return same.find((c) => String(c.customFields?.class ?? c.class) === String(me.class_no)) || same[0] || null;
