@@ -13,7 +13,8 @@ export default function Join() {
   const [cls, setCls] = useState('');
   const [pick, setPick] = useState(null);
   const [phone, setPhone] = useState('');
-  const [rsvp, setRsvp] = useState('maybe');
+  const SHOW_RSVP = false; // להחזיר ל-true כשמתקרבים לתאריך
+  const [rsvp, setRsvp] = useState('unknown');
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
@@ -84,13 +85,15 @@ export default function Join() {
         </div>
       </form> : <form onSubmit={save}>
         <h2>{pick.name}</h2>
-        <p className="sub">יב{pick.class_no}. עוד פרט אחד ואתם בפנים.</p>
+        <p className="sub">יב{pick.class_no}. עוד פרט אחד ואתם בפנים. אין צורך להחליט על ההגעה עכשיו.</p>
         <label htmlFor="phone">טלפון</label>
         <input id="phone" type="tel" inputMode="tel" autoComplete="tel" dir="ltr" required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0528449959" />
+        {SHOW_RSVP && <>
         <label>האם תגיעו?</label>
         <div className="seg" role="group" aria-label="האם תגיעו">
           {['yes', 'maybe', 'no'].map((k) => <button type="button" key={k} aria-pressed={rsvp === k} onClick={() => setRsvp(k)}>{k === 'yes' ? 'מגיע/ה' : k === 'maybe' ? 'אולי' : 'לא'}</button>)}
         </div>
+        </>}
         <p className="hint">הטלפון גלוי רק למארגנים.</p>
         {err && <p className="err">{err}</p>}
         <div className="row" style={{ marginTop: 18 }}>
