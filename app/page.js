@@ -40,6 +40,8 @@ export default function Home() {
         <ul className="facts"><li><b>10</b>כיתות</li><li><b>{people ? t.total : '339'}</b>חברים ברשימה</li><li><b>1</b>ערב</li></ul>
       </section>
 
+      {inside && person && <section><div className="card welcome"><span className="wave">👋</span><h2>היי {person.name.split(' ').reverse().join(' ')}</h2><p className="sub">טוב שאתה כאן. עזרו לנו להגיע לכולם.</p></div></section>}
+
       {inside && ann.map((a) => (
         <section key={a.id}><div className="card ann">
           {a.pinned && <span className="pin">הודעה מהמארגנים</span>}

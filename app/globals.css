@@ -126,3 +126,10 @@ a.leg{color:inherit;text-decoration:none;border-radius:12px} a.leg:active{opacit
 .lrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
 .lrow small{color:var(--muted);margin-inline-start:8px}
 .lrow .btn{min-height:40px;padding:0 16px;font-size:14px}
+
+.welcome{text-align:center;padding:18px 12px;margin-bottom:14px;border-radius:18px;background:linear-gradient(160deg,#ffc85722,#5b6bff22);border:1px solid #ffc85755}
+.welcome h2{margin:6px 0 4px;font-size:clamp(26px,8vw,34px);color:var(--gold)}
+.welcome .sub{margin:0}
+.wave{font-size:34px;display:inline-block;animation:wave 2.4s ease-in-out infinite;transform-origin:70% 70%}
+@keyframes wave{0%,60%,100%{transform:rotate(0)}10%,30%{transform:rotate(14deg)}20%,40%{transform:rotate(-8deg)}50%{transform:rotate(10deg)}}
+@media (prefers-reduced-motion:reduce){.wave{animation:none}}

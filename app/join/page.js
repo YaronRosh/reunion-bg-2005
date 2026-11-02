@@ -74,8 +74,9 @@ export default function Join() {
           {q && !results.length && <p className="hint">לא מצאנו. נסו שם אחר, או כתבו למארגנים ונוסיף אתכם.</p>}
         </div>
       </div> : pick.claimed_by ? <form onSubmit={recover}>
-        <h2>{pick.name}</h2>
-        <p className="sub">השם הזה כבר רשום. כדי להמשיך מכאן, הקלידו את אותו טלפון שהשארתם בהרשמה.</p>
+        <div className="welcome"><span className="wave">👋</span>
+          <h2>היי {pick.name.split(' ').reverse().join(' ')}</h2>
+          <p className="sub">כבר רשום אצלנו, שמחים שחזרת. כדי להמשיך מכאן, הקלד/י את הטלפון שהשארת בהרשמה.</p></div>
         <label htmlFor="phone">טלפון</label>
         <input id="phone" type="tel" inputMode="tel" autoComplete="tel" dir="ltr" required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0528449959" autoFocus />
         {err && <p className="err">{err}</p>}
