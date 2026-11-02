@@ -45,14 +45,15 @@ export async function POST(req) {
     const card = await findCard(me);
     if (!card) return fail('card not found', 404);
     if (action === 'get') {
-      return Response.json({ ok: true, phone: card.phone || '', email: card.email || '', occupation: card.customFields?.occupation || card.occupation || '' });
+      return Response.json({ ok: true, phone: card.phone || '', email: card.email || '', occupation: card.customFields?.career || '' });
     }
-    const body = { name: card.name };
+    const body = { name: card.name, leadStatus: 'IN_PROGRESS' }; // 'נרשם - בקבוצה'
     if (phone) body.phone = phone;
     if (email) body.email = email;
-    if (occupation != null) body.customFields = { occupation: String(occupation).slice(0, 200) };
+    if (occupation != null) body.customFields = { career: String(occupation).slice(0, 200) };
     const r = await fetch(`${BASE}/${card.id}`, { method: 'PUT', headers: H(), body: JSON.stringify(body) });
-    return Response.json({ ok: r.ok }, { status: r.ok ? 200 : 502 });
+    const detail = r.ok ? '' : `${r.status} ${(await r.text()).slice(0, 300)}`;
+    return Response.json({ ok: r.ok, detail }, { status: r.ok ? 200 : 502 });
   } catch (e) {
     return fail(String(e.message || e), 500);
   }
