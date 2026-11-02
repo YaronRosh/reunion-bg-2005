@@ -1,14 +1,19 @@
-// כתיבה ל-Pecanify מצד השרת בלבד. המפתח נשמר ב-PECANIFY_API_KEY ב-Vercel.
+// קריאה/כתיבה ל-Pecanify מצד השרת בלבד. המפתח נשמר ב-PECANIFY_API_KEY ב-Vercel.
+// המשתמש יכול לגעת רק בכרטיס של השם שהוא רשם (נבדק מול Supabase עם הטוקן שלו).
 const BASE = 'https://www.pecanify.com/api/public/cards/contacts';
 const key = () => (process.env.PECANIFY_API_KEY || '').replace(/^Bearer\s+/i, '').trim();
 const H = () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${key()}` });
 const norm = (s) => (s || '').replace(/[\s'׳"״]/g, '').toLowerCase();
 
-async function verifyUser(token) {
+async function myRow(token) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL, anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !token) return false;
-  const r = await fetch(`${url}/auth/v1/user`, { headers: { apikey: anon, Authorization: `Bearer ${token}` } });
-  return r.ok;
+  if (!url || !token) return null;
+  const u = await fetch(`${url}/auth/v1/user`, { headers: { apikey: anon, Authorization: `Bearer ${token}` } });
+  if (!u.ok) return null;
+  const { id } = await u.json();
+  const r = await fetch(`${url}/rest/v1/people?claimed_by=eq.${id}&select=name,class_no&limit=1`, { headers: { apikey: anon, Authorization: `Bearer ${token}` } });
+  const rows = r.ok ? await r.json() : [];
+  return rows[0] || null;
 }
 
 async function allCards() {
@@ -23,22 +28,32 @@ async function allCards() {
   return out;
 }
 
+async function findCard(me) {
+  const cards = await allCards();
+  const same = cards.filter((c) => norm(c.name) === norm(me.name));
+  return same.find((c) => String(c.customFields?.class ?? c.class) === String(me.class_no)) || same[0] || null;
+}
+
+const fail = (error, status) => Response.json({ ok: false, error }, { status });
+
 export async function POST(req) {
   try {
-    if (!key()) return Response.json({ ok: false, error: 'no key' }, { status: 500 });
-    const { name, class_no, phone, email, occupation, token } = await req.json();
-    if (!name || !(await verifyUser(token))) return Response.json({ ok: false, error: 'unauthorized' }, { status: 401 });
-    const cards = await allCards();
-    const card = cards.find((c) => norm(c.name) === norm(name) && String(c.customFields?.class ?? c.class ?? class_no) === String(class_no))
-      || cards.find((c) => norm(c.name) === norm(name));
-    if (!card) return Response.json({ ok: false, error: 'card not found' }, { status: 404 });
+    if (!key()) return fail('no key', 500);
+    const { action, phone, email, occupation, token } = await req.json();
+    const me = await myRow(token);
+    if (!me) return fail('unauthorized', 401);
+    const card = await findCard(me);
+    if (!card) return fail('card not found', 404);
+    if (action === 'get') {
+      return Response.json({ ok: true, phone: card.phone || '', email: card.email || '', occupation: card.customFields?.occupation || card.occupation || '' });
+    }
     const body = { name: card.name };
     if (phone) body.phone = phone;
     if (email) body.email = email;
-    if (occupation) body.customFields = { occupation: String(occupation).slice(0, 200) };
+    if (occupation != null) body.customFields = { occupation: String(occupation).slice(0, 200) };
     const r = await fetch(`${BASE}/${card.id}`, { method: 'PUT', headers: H(), body: JSON.stringify(body) });
     return Response.json({ ok: r.ok }, { status: r.ok ? 200 : 502 });
   } catch (e) {
-    return Response.json({ ok: false, error: String(e.message || e) }, { status: 500 });
+    return fail(String(e.message || e), 500);
   }
 }

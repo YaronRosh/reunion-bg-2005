@@ -97,6 +97,7 @@ export default function Join() {
         <p className="hint">כדי שנוכל לעדכן אתכם על הערב. גלוי רק למארגנים.</p>
         <label htmlFor="job">במה אתם עוסקים היום?</label>
         <input id="job" type="text" autoComplete="organization-title" value={job} onChange={(e) => setJob(e.target.value)} placeholder="למשל: רופאה, מפתח, מורה" />
+        <p className="hint">תמיד טוב לדעת אם יש רופא בקהל, או דיג'יי 😉</p>
         {SHOW_RSVP && <>
         <label>האם תגיעו?</label>
         <div className="seg" role="group" aria-label="האם תגיעו">
