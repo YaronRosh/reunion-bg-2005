@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { getUser, isAdmin, getPeople, getAnnouncements, postAnnouncement, deleteAnnouncement, importRows, signOut } from '@/lib/data';
+import { getUser, isAdmin, getPeople, getAnnouncements, postAnnouncement, deleteAnnouncement, importRows, signOut, listOrganizers, addOrganizer, removeOrganizer } from '@/lib/data';
 import { parseCsv, toPeople } from '@/lib/csv';
+import { searchPeople } from '@/lib/search';
 import { CLASSES } from '@/lib/classes';
 import { DEMO } from '@/lib/supabase';
 
@@ -9,11 +10,12 @@ export default function Admin() {
   const [user, setUser] = useState(undefined);
   const [ok, setOk] = useState(false);
   const [email, setEmail] = useState(''); const [code, setCode] = useState(''); const [sent, setSent] = useState(false);
+  const [orgs, setOrgs] = useState([]); const [oq, setOq] = useState('');
   const [ann, setAnn] = useState([]); const [people, setPeople] = useState([]);
   const [f, setF] = useState({ title: '', body: '', pinned: true });
   const [cls, setCls] = useState(0); const [msg, setMsg] = useState('');
 
-  const load = async () => { setAnn(await getAnnouncements()); setPeople(await getPeople()); };
+  const load = async () => { setAnn(await getAnnouncements()); setPeople(await getPeople()); try { setOrgs(await listOrganizers()); } catch {} };
   useEffect(() => { (async () => { const u = await getUser(); setUser(u); if (u) { setOk(await isAdmin(u)); load(); } })(); }, []);
 
   const missing = useMemo(() => people.filter((p) => p.match !== 'sure' && (!cls || p.class_no === cls)), [people, cls]);
@@ -29,6 +31,14 @@ export default function Admin() {
         <p className="sub">{DEMO ? 'לא מחובר למסד נתונים (מצב הדגמה).' : `מחובר למסד הנתונים. ${people.length} אנשים טעונים.`}</p>
         <div className="row"><button className="btn" onClick={async () => { const rows = await (await fetch('/seed.json')).json(); const res = await importRows(rows); setMsg(res.error ? 'שגיאה: ' + res.error : `נטענו ${rows.length} אנשים`); load(); }}>טענו את כל הרשימה מהגיליון</button></div>
         {msg && <p className="hint">{msg}</p>}
+      </section>
+
+      <section className="card">
+        <h2>מארגנים</h2>
+        <p className="sub">מי שנרשם באתר ורשום כאן הוא מארגן ורואה את אזור הניהול. כדי להוסיף: מחפשים שם ולוחצים.</p>
+        <div className="list">{orgs.map((o) => <div className="item" key={o.class_no + o.name}><span>{o.name} <small>יב{o.class_no}</small></span><button className="pill" onClick={async () => { await removeOrganizer(o); load(); }}>הסרה</button></div>)}</div>
+        <input value={oq} onChange={(e) => setOq(e.target.value)} placeholder="חיפוש שם להוספה" style={{ marginTop: 12 }} />
+        <div className="list">{oq && searchPeople(people, oq, 6).map((p) => <button className="item" key={p.id} onClick={async () => { await addOrganizer(p); setOq(''); load(); }}><span>{p.name} <small>יב{p.class_no}</small></span><span className="chip">הוספה כמארגן</span></button>)}</div>
       </section>
 
       <section className="card">

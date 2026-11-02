@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { getPeople, ensureSession, claimPerson, recoverPerson, becomeAdmin } from '@/lib/data';
+import { getPeople, ensureSession, claimPerson, recoverPerson } from '@/lib/data';
 import { searchPeople } from '@/lib/search';
 import { CLASSES } from '@/lib/classes';
 import { useAuth, refreshAuth } from '@/components/auth';
@@ -18,7 +18,6 @@ export default function Join() {
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
-  const [org, setOrg] = useState(false);
   const [email, setEmail] = useState('');
   const [mail, setMail] = useState('');
   const [sent, setSent] = useState(false);
@@ -109,14 +108,6 @@ export default function Join() {
         </div>
       </form>}
 
-      {!pick && <div style={{ marginTop: 26, borderTop: '1px solid var(--line)', paddingTop: 14 }}>
-        {!org ? <button className="pill" onClick={() => setOrg(true)}>אני מארגן/ת</button> : <>
-          <label htmlFor="oc">קוד מארגנים</label>
-          <input id="oc" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="off" />
-          <div className="row" style={{ marginTop: 12 }}><button className="btn ghost" onClick={async () => { try { await ensureSession(); const ok = await becomeAdmin(email); if (ok) { await refreshAuth(); window.location.href = '/admin'; } else setErr('הקוד לא נכון.'); } catch (e) { setErr('שגיאה: ' + (e?.message || 'לא הצלחנו')); } }}>כניסה</button></div>
-          {err && <p className="err">{err}</p>}
-        </>}
-      </div>}
     </section></main>
   );
 }
