@@ -23,17 +23,17 @@ const firstArray = (j) => {
 };
 let lastDiag = '';
 async function allCards() {
-  const out = [];
-  for (let page = 0; page < 10; page++) {
-    const r = await fetch(`${BASE}/search`, { method: 'POST', headers: H(), body: JSON.stringify({ sort: [{ field: 'name', order: 'ASC' }], limit: 250, offset: page * 250, filter: {} }) });
+  // ה-API מחזיר עד 250 בבקשה והדילוג לא מובטח, לכן שולפים פעם בסדר עולה ופעם ביורד ומאחדים
+  const seen = new Map();
+  for (const order of ['ASC', 'DESC']) {
+    const r = await fetch(`${BASE}/search`, { method: 'POST', headers: H(), body: JSON.stringify({ sort: [{ field: 'name', order }], limit: 250, filter: {} }) });
     const txt = await r.text();
     let j = {}; try { j = JSON.parse(txt); } catch {}
     const list = firstArray(j);
-    if (page === 0) lastDiag = `search ${r.status} items=${list.length} ${list.length ? '' : txt.slice(0, 200)}`;
-    out.push(...list);
-    if (list.length < 250) break;
+    lastDiag = `search ${r.status} items=${list.length}`;
+    list.forEach((c) => seen.set(c.id, c));
   }
-  return out;
+  return [...seen.values()];
 }
 
 async function byName(name) {
