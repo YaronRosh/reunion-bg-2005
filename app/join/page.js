@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { getPeople, ensureSession, claimPerson, becomeAdmin } from '@/lib/data';
+import { getPeople, ensureSession, claimPerson, recoverPerson, becomeAdmin } from '@/lib/data';
 import { searchPeople } from '@/lib/search';
 import { CLASSES } from '@/lib/classes';
 import { useAuth, refreshAuth } from '@/components/auth';
@@ -25,6 +25,16 @@ export default function Join() {
   const pool = useMemo(() => people.filter((p) => !cls || p.class_no === +cls), [people, cls]);
   const results = useMemo(() => searchPeople(pool, q), [pool, q]);
   const inside = auth.status === 'member' || auth.status === 'admin';
+
+  async function recover(e) {
+    e.preventDefault(); setBusy(true); setErr('');
+    try {
+      await ensureSession();
+      if (await recoverPerson(pick, phone)) { setDone(true); refreshAuth(); }
+      else setErr('הטלפון לא תואם למה שהושאר. נסו את המספר שהקלדתם בהרשמה, או כתבו למארגנים.');
+    } catch { setErr('לא הצלחנו. נסו שוב.'); }
+    setBusy(false);
+  }
 
   async function save(e) {
     e.preventDefault(); setBusy(true); setErr('');
@@ -62,7 +72,17 @@ export default function Join() {
             <span>{p.name}</span><small>יב{p.class_no}</small></button>)}
           {q && !results.length && <p className="hint">לא מצאנו. נסו שם אחר, או כתבו למארגנים ונוסיף אתכם.</p>}
         </div>
-      </div> : <form onSubmit={save}>
+      </div> : pick.claimed_by ? <form onSubmit={recover}>
+        <h2>{pick.name}</h2>
+        <p className="sub">השם הזה כבר רשום. כדי להמשיך מכאן, הקלידו את אותו טלפון שהשארתם בהרשמה.</p>
+        <label htmlFor="phone">טלפון</label>
+        <input id="phone" type="tel" inputMode="tel" autoComplete="tel" dir="ltr" required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0528449959" autoFocus />
+        {err && <p className="err">{err}</p>}
+        <div className="row" style={{ marginTop: 18 }}>
+          <button className="btn" disabled={busy}>המשך</button>
+          <button type="button" className="btn ghost" onClick={() => { setPick(null); setErr(''); setPhone(''); }}>זה לא אני</button>
+        </div>
+      </form> : <form onSubmit={save}>
         <h2>{pick.name}</h2>
         <p className="sub">יב{pick.class_no}. עוד פרט אחד ואתם בפנים.</p>
         <label htmlFor="phone">טלפון</label>

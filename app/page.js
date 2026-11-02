@@ -1,12 +1,14 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getPeople, getAnnouncements, stats } from '@/lib/data';
+import { getPeople, getAnnouncements, stats, setRsvp } from '@/lib/data';
 import { Dashboard } from '@/components/ui';
 import { useAuth } from '@/components/auth';
 
 export default function Home() {
-  const { status } = useAuth();
+  const { status, person } = useAuth();
+  const [mine, setMine] = useState(null);
+  useEffect(() => { if (person) setMine(person.rsvp); }, [person]);
   const inside = status === 'member' || status === 'admin';
   const [people, setPeople] = useState(null);
   const [ann, setAnn] = useState([]);
@@ -46,6 +48,13 @@ export default function Home() {
       ))}
 
       {!inside && status !== 'loading' && <section><div className="card"><h2>האתר פתוח לבוגרי המחזור</h2><p className="sub">כדי לראות מי כבר כאן, מי עוד חסר ומה קורה בערב, מוצאים את השם שלכם ברשימה ומשאירים טלפון. זה לוקח חצי דקה.</p><Link href="/join" className="btn">מצאו את השם שלכם</Link></div></section>}
+
+      {inside && person && <section><div className="card">
+        <h2>ההגעה שלי</h2>
+        <div className="seg" role="group" aria-label="ההגעה שלי">
+          {[['yes', 'מגיע/ה'], ['maybe', 'אולי'], ['no', 'לא']].map(([k, t]) => <button key={k} aria-pressed={mine === k} onClick={async () => { setMine(k); await setRsvp(person, k); }}>{t}</button>)}
+        </div>
+      </div></section>}
 
       {inside && <section>
         <div className="card">
