@@ -11,7 +11,7 @@ export default function Admin() {
   const [email, setEmail] = useState(''); const [code, setCode] = useState(''); const [sent, setSent] = useState(false);
   const [ann, setAnn] = useState([]); const [people, setPeople] = useState([]);
   const [f, setF] = useState({ title: '', body: '', pinned: true });
-  const [cls, setCls] = useState(0); const [msg, setMsg] = useState('');
+  const [code, setCode] = useState(''); const [cls, setCls] = useState(0); const [msg, setMsg] = useState('');
 
   const load = async () => { setAnn(await getAnnouncements()); setPeople(await getPeople()); };
   useEffect(() => { (async () => { const u = await getUser(); setUser(u); if (u) { setOk(await isAdmin(u)); load(); } })(); }, []);
@@ -28,6 +28,18 @@ export default function Admin() {
         <h2>סטטוס מערכת</h2>
         <p className="sub">{DEMO ? 'לא מחובר למסד נתונים (מצב הדגמה).' : `מחובר למסד הנתונים. ${people.length} אנשים טעונים.`}</p>
         <div className="row"><button className="btn" onClick={async () => { const rows = await (await fetch('/seed.json')).json(); const res = await importRows(rows); setMsg(res.error ? 'שגיאה: ' + res.error : `נטענו ${rows.length} אנשים`); load(); }}>טענו את כל הרשימה מהגיליון</button></div>
+        {msg && <p className="hint">{msg}</p>}
+      </section>
+
+      <section className="card">
+        <h2>סנכרון לאקסל</h2>
+        <p className="sub">הקלידו את קוד המארגנים, העתיקו, והדביקו בגיליון: Extensions → Apps Script. אחר כך הריצו sync פעם אחת, והגדירו Trigger כל 10 דקות. ההרשמות, הטלפונים והמיילים יופיעו בלשונית "רישום מהאתר".</p>
+        <input dir="ltr" value={code} onChange={(e) => setCode(e.target.value)} placeholder="קוד מארגנים" autoComplete="off" />
+        <div className="row" style={{ marginTop: 12 }}><button className="btn" disabled={!code} onClick={async () => {
+          const t = await (await fetch('/sheet-sync.gs')).text();
+          const out = t.replace('PUT_URL', process.env.NEXT_PUBLIC_SUPABASE_URL).replace('PUT_ANON_KEY', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY).replace('PUT_ORGANIZER_CODE', code.trim());
+          try { await navigator.clipboard.writeText(out); setMsg('הקוד הועתק. הדביקו אותו ב-Apps Script.'); } catch { setMsg('לא הצלחנו להעתיק'); }
+        }}>העתיקו קוד לגיליון</button></div>
         {msg && <p className="hint">{msg}</p>}
       </section>
 
