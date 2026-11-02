@@ -11,7 +11,7 @@ export default function Admin() {
   const [email, setEmail] = useState(''); const [code, setCode] = useState(''); const [sent, setSent] = useState(false);
   const [ann, setAnn] = useState([]); const [people, setPeople] = useState([]);
   const [f, setF] = useState({ title: '', body: '', pinned: true });
-  const [code, setCode] = useState(''); const [cls, setCls] = useState(0); const [msg, setMsg] = useState('');
+  const [cls, setCls] = useState(0); const [msg, setMsg] = useState('');
 
   const load = async () => { setAnn(await getAnnouncements()); setPeople(await getPeople()); };
   useEffect(() => { (async () => { const u = await getUser(); setUser(u); if (u) { setOk(await isAdmin(u)); load(); } })(); }, []);
