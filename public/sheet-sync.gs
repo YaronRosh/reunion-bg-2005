@@ -38,4 +38,8 @@ function sync() {
     }
   }
   call('sync_organizers', { p_code: ORG_CODE, p_list: orgs });
+  // יוצר לבד טריגר כל 10 דקות, אם עדיין אין
+  if (!ScriptApp.getProjectTriggers().some((t) => t.getHandlerFunction() === 'sync')) {
+    ScriptApp.newTrigger('sync').timeBased().everyMinutes(10).create();
+  }
 }
