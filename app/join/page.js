@@ -79,7 +79,7 @@ export default function Join() {
           <h2>היי {pick.name.split(' ').reverse().join(' ')}</h2>
           <p className="sub">כבר רשום אצלנו, שמחים שחזרת. כדי להמשיך מכאן, הקלד/י את הטלפון שהשארת בהרשמה.</p></div>
         <label htmlFor="phone">טלפון</label>
-        <input id="phone" type="tel" inputMode="tel" autoComplete="tel" dir="ltr" required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0528449959" autoFocus />
+        <input id="phone" type="tel" inputMode="tel" autoComplete="tel" dir="ltr" required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0501234567" autoFocus />
         <label htmlFor="mail">אימייל (אם עוד לא השארתם)</label>
         <input id="mail" type="email" inputMode="email" autoComplete="email" dir="ltr" value={mail} onChange={(e) => setMail(e.target.value)} placeholder="name@gmail.com" />
         {err && <p className="err">{err}</p>}
@@ -91,7 +91,7 @@ export default function Join() {
         <h2>{pick.name}</h2>
         <p className="sub">יב{pick.class_no}. עוד פרט אחד ואתם בפנים. אין צורך להחליט על ההגעה עכשיו.</p>
         <label htmlFor="phone">טלפון</label>
-        <input id="phone" type="tel" inputMode="tel" autoComplete="tel" dir="ltr" required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0528449959" />
+        <input id="phone" type="tel" inputMode="tel" autoComplete="tel" dir="ltr" required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0501234567" />
         <label htmlFor="mail">אימייל</label>
         <input id="mail" type="email" inputMode="email" autoComplete="email" dir="ltr" required value={mail} onChange={(e) => setMail(e.target.value)} placeholder="name@gmail.com" />
         <p className="hint">כדי שנוכל לעדכן אתכם על הערב. גלוי רק למארגנים.</p>

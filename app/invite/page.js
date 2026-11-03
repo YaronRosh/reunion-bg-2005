@@ -42,7 +42,7 @@ export default function Invite() {
           {q && !res.length && <p className="hint">אין התאמה. נסו שם אחר.</p>}</div>
       </> : <>
         <label htmlFor="ph">הטלפון של {first(pick)}</label>
-        <input id="ph" type="tel" inputMode="tel" dir="ltr" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0528449959" autoFocus />
+        <input id="ph" type="tel" inputMode="tel" dir="ltr" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0501234567" autoFocus />
         <div className="row" style={{ marginTop: 18 }}>
           <button className="btn" disabled={toIntl(phone).length < 11} onClick={send}>פתחו הודעה בווטסאפ</button>
           <button className="btn ghost" onClick={() => { setPick(null); setPhone(''); }}>בחרו מישהו אחר</button>
