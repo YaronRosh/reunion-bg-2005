@@ -13,6 +13,8 @@ export default function Admin() {
   const [orgs, setOrgs] = useState([]); const [oq, setOq] = useState('');
   const [ann, setAnn] = useState([]); const [people, setPeople] = useState([]);
   const [f, setF] = useState({ title: '', body: '', pinned: true });
+  const [busy, setBusy] = useState(false);
+  const go = (fn) => async (...a) => { if (busy) return; setBusy(true); try { await fn(...a); } catch { setMsg('משהו השתבש. נסו שוב.'); } setBusy(false); };
   const [cls, setCls] = useState(0); const [msg, setMsg] = useState('');
 
   const load = async () => { setAnn(await getAnnouncements()); setPeople(await getPeople()); try { setOrgs(await listOrganizers()); } catch {} };
@@ -29,27 +31,26 @@ export default function Admin() {
       <section className="card" style={{ marginTop: 18 }}>
         <h2>סטטוס מערכת</h2>
         <p className="sub">{DEMO ? 'לא מחובר למסד נתונים (מצב הדגמה).' : `מחובר למסד הנתונים. ${people.length} אנשים טעונים.`}</p>
-        <div className="row"><button className="btn" onClick={async () => { const rows = await (await fetch('/seed.json')).json(); const res = await importRows(rows); setMsg(res.error ? 'שגיאה: ' + res.error : `נטענו ${rows.length} אנשים`); load(); }}>טענו את כל הרשימה מהגיליון</button></div>
+        <div className="row"><button className="btn" disabled={busy} onClick={go(async () => { const rows = await (await fetch('/seed.json')).json(); const res = await importRows(rows); setMsg(res.error ? 'שגיאה: ' + res.error : `נטענו ${rows.length} אנשים`); load();})}>טענו את כל הרשימה מהגיליון</button></div>
         {msg && <p className="hint">{msg}</p>}
       </section>
 
       <section className="card">
         <h2>מארגנים</h2>
         <p className="sub">מי שנרשם באתר ורשום כאן הוא מארגן ורואה את אזור הניהול. כדי להוסיף: מחפשים שם ולוחצים.</p>
-        <div className="list">{orgs.map((o) => <div className="item" key={o.class_no + o.name}><span>{o.name} <small>יב{o.class_no}</small></span><button className="pill" onClick={async () => { await removeOrganizer(o); load(); }}>הסרה</button></div>)}</div>
+        <div className="list">{orgs.map((o) => <div className="item" key={o.class_no + o.name}><span>{o.name} <small>יב{o.class_no}</small></span><button className="pill" disabled={busy} onClick={go(async () => { await removeOrganizer(o); load();})}>הסרה</button></div>)}</div>
         <input value={oq} onChange={(e) => setOq(e.target.value)} placeholder="חיפוש שם להוספה" style={{ marginTop: 12 }} />
-        <div className="list">{oq && searchPeople(people, oq, 6).map((p) => <button className="item" key={p.id} onClick={async () => { await addOrganizer(p); setOq(''); load(); }}><span>{p.name} <small>יב{p.class_no}</small></span><span className="chip">הוספה כמארגן</span></button>)}</div>
+        <div className="list">{oq && searchPeople(people, oq, 6).map((p) => <button className="item" key={p.id} disabled={busy} onClick={go(async () => { await addOrganizer(p); setOq(''); load();})}><span>{p.name} <small>יב{p.class_no}</small></span><span className="chip">הוספה כמארגן</span></button>)}</div>
       </section>
 
       <section className="card">
         <h2>סנכרון לאקסל</h2>
         <p className="sub">הקלידו את קוד המארגנים, העתיקו, והדביקו בגיליון: Extensions → Apps Script. אחר כך הריצו sync פעם אחת, והגדירו Trigger כל 10 דקות. ההרשמות, הטלפונים והמיילים יופיעו בלשוניות הכיתות (טלפון בעמודה E, אימייל בעמודה H).</p>
         <input dir="ltr" value={code} onChange={(e) => setCode(e.target.value)} placeholder="קוד מארגנים" autoComplete="off" />
-        <div className="row" style={{ marginTop: 12 }}><button className="btn" disabled={!code} onClick={async () => {
+        <div className="row" style={{ marginTop: 12 }}><button className="btn" disabled={busy || !code} onClick={go(async () => {
           const t = await (await fetch('/sheet-sync.gs')).text();
           const out = t.replace('PUT_URL', process.env.NEXT_PUBLIC_SUPABASE_URL).replace('PUT_ANON_KEY', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY).replace('PUT_ORGANIZER_CODE', code.trim());
-          try { await navigator.clipboard.writeText(out); setMsg('הקוד הועתק. הדביקו אותו ב-Apps Script.'); } catch { setMsg('לא הצלחנו להעתיק'); }
-        }}>העתיקו קוד לגיליון</button></div>
+          try { await navigator.clipboard.writeText(out); setMsg('הקוד הועתק. הדביקו אותו ב-Apps Script.'); } catch { setMsg('לא הצלחנו להעתיק'); }})}>העתיקו קוד לגיליון</button></div>
         {msg && <p className="hint">{msg}</p>}
       </section>
 
@@ -58,8 +59,8 @@ export default function Admin() {
         <label htmlFor="t">כותרת</label><input id="t" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} />
         <label htmlFor="b">תוכן</label><textarea id="b" value={f.body} onChange={(e) => setF({ ...f, body: e.target.value })} />
         <label style={{ display: 'flex', gap: 10, alignItems: 'center' }}><input type="checkbox" style={{ width: 22, minHeight: 22 }} checked={f.pinned} onChange={(e) => setF({ ...f, pinned: e.target.checked })} />להצמיד בראש האתר</label>
-        <div className="row" style={{ marginTop: 14 }}><button className="btn" disabled={!f.title || !f.body} onClick={async () => { await postAnnouncement(f); setF({ title: '', body: '', pinned: true }); load(); }}>פרסמו</button></div>
-        <div className="list" style={{ marginTop: 18 }}>{ann.map((a) => <div className="item" key={a.id}><span>{a.title}</span><button className="pill" onClick={async () => { await deleteAnnouncement(a.id); load(); }}>מחיקה</button></div>)}</div>
+        <div className="row" style={{ marginTop: 14 }}><button className="btn" disabled={busy || !f.title || !f.body} onClick={go(async () => { await postAnnouncement(f); setF({ title: '', body: '', pinned: true }); load();})}>פרסמו</button></div>
+        <div className="list" style={{ marginTop: 18 }}>{ann.map((a) => <div className="item" key={a.id}><span>{a.title}</span><button className="pill" disabled={busy} onClick={go(async () => { await deleteAnnouncement(a.id); load();})}>מחיקה</button></div>)}</div>
       </section>
 
       <section className="card">
@@ -73,9 +74,9 @@ export default function Admin() {
       <section className="card">
         <h2>ייבוא מהגיליון</h2>
         <p className="sub">ייצאו את לשונית "כולם" כ-CSV והעלו כאן. שמות וכיתות בלבד נשמרים.</p>
-        <input type="file" accept=".csv" onChange={async (e) => { const t = await e.target.files[0].text(); const r = toPeople(parseCsv(t)); const res = await importRows(r); setMsg(res.error || `יובאו ${r.length} אנשים`); load(); }} />
+        <input type="file" accept=".csv" disabled={busy} onChange={go(async (e) => { const t = await e.target.files[0].text(); const r = toPeople(parseCsv(t)); const res = await importRows(r); setMsg(res.error || `יובאו ${r.length} אנשים`); load();})} />
         {msg && <p className="hint">{msg}</p>}
-        <div className="row" style={{ marginTop: 14 }}><button className="btn ghost" onClick={async () => { await signOut(); location.reload(); }}>יציאה</button></div>
+        <div className="row" style={{ marginTop: 14 }}><button className="btn ghost" disabled={busy} onClick={go(async () => { await signOut(); location.reload();})}>יציאה</button></div>
       </section>
     </main>
   );
