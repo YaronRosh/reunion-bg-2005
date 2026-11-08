@@ -1,5 +1,6 @@
 import './globals.css';
 import { Shell } from '@/components/ui';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata = {
   title: 'מחזור 2005 בן גוריון',
@@ -16,7 +17,7 @@ export default function Root({ children }) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Rubik:wght@600;800;900&display=swap" rel="stylesheet" />
       </head>
-      <body><Shell>{children}</Shell></body>
+      <body><Shell>{children}</Shell><Analytics /></body>
     </html>
   );
 }
