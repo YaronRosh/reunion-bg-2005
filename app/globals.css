@@ -58,6 +58,7 @@ input::placeholder{color:#6f78a3}
 .item:hover{border-color:var(--gold)} .item small{color:var(--muted)}
 .chip{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:700;background:var(--ink-3)}
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.seg.two{grid-template-columns:repeat(2,1fr)}
 .seg button{min-height:52px;border-radius:14px;border:1.5px solid var(--line);background:var(--ink);color:var(--paper);font:700 16px var(--body);cursor:pointer}
 .seg button[aria-pressed=true]{background:var(--gold);color:var(--gold-ink);border-color:var(--gold)}
 .steps{display:flex;gap:6px;margin-bottom:16px}.steps i{height:5px;flex:1;border-radius:9px;background:var(--ink-3)}.steps i.on{background:var(--gold)}

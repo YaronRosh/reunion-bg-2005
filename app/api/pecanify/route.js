@@ -42,17 +42,18 @@ const fail = (error, status) => Response.json({ ok: false, error }, { status });
 export async function POST(req) {
   try {
     if (!key()) return fail('no key', 500);
-    const { action, phone, email, occupation, token } = await req.json();
+    const { action, phone, email, occupation, rsvp, token } = await req.json();
     const me = await myRow(token);
     if (!me) return fail('unauthorized', 401);
     const card = await findCard(me);
     if (!card) return fail(`card not found (${me.name}) ${lastDiag}${diag}`, 404);
     if (action === 'get') {
-      return Response.json({ ok: true, phone: card.phone || '', email: card.email || '', occupation: card.customFields?.career || '' });
+      return Response.json({ ok: true, phone: card.phone || '', email: card.email || '', occupation: card.customFields?.career || '', rsvp: card.customFields?.rsvp || 'unknown' });
     }
     const body = { name: card.name, leadStatus: 'IN_PROGRESS', customFields: { match_status: 'sure', custom_field_jo31: '1' } }; // 'נרשם - בקבוצה'
     if (phone) body.phone = phone;
     if (email) body.email = email;
+    if (['yes', 'no', 'maybe'].includes(rsvp)) body.customFields.rsvp = rsvp;
     if (occupation != null) body.customFields.career = String(occupation).slice(0, 200);
     const r = await fetch(`${BASE}/${card.id}`, { method: 'PUT', headers: H(), body: JSON.stringify(body) });
     const detail = r.ok ? '' : `${r.status} ${(await r.text()).slice(0, 300)}`;

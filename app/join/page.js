@@ -14,7 +14,7 @@ export default function Join() {
   const [cls, setCls] = useState('');
   const [pick, setPick] = useState(null);
   const [phone, setPhone] = useState('');
-  const SHOW_RSVP = false; // להחזיר ל-true כשמתקרבים לתאריך
+  const SHOW_RSVP = true;
   const [rsvp, setRsvp] = useState('unknown');
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -100,10 +100,11 @@ export default function Join() {
         <input id="job" type="text" autoComplete="organization-title" value={job} onChange={(e) => setJob(e.target.value)} placeholder="למשל: רופאה, מפתח, מורה" />
         <p className="hint">לא חובה, ואף אחד לא לוחץ 🙂 אבל תמיד טוב לדעת אם יש רופא בקהל, דיג'יי, או מישהו שיסדר לנו הנחה בקייטרינג 😉</p>
         {SHOW_RSVP && <>
-        <label>האם תגיעו?</label>
-        <div className="seg" role="group" aria-label="האם תגיעו">
-          {['yes', 'maybe', 'no'].map((k) => <button type="button" key={k} aria-pressed={rsvp === k} onClick={() => setRsvp(k)}>{k === 'yes' ? 'מגיע/ה' : k === 'maybe' ? 'אולי' : 'לא'}</button>)}
+        <label>מתכוונים להגיע לערב המחזור? (בערך באפריל, בנס ציונה)</label>
+        <div className="seg two" role="group" aria-label="האם אתם מתכוונים להגיע">
+          {[['yes', 'כן, אני בא/ה'], ['no', 'כנראה שלא']].map(([k, t]) => <button type="button" key={k} aria-pressed={rsvp === k} onClick={() => setRsvp(rsvp === k ? 'unknown' : k)}>{t}</button>)}
         </div>
+        <p className="hint">זו רק כוונה ולא התחייבות. אפשר לשנות בכל רגע ב"הפרטים שלי".</p>
         </>}
         {err && <p className="err">{err}</p>}
         <div className="row" style={{ marginTop: 18 }}>
