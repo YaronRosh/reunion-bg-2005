@@ -40,6 +40,12 @@ export default function Home() {
         <ul className="facts"><li><b>10</b>כיתות</li><li><b>{people ? t.total : '339'}</b>חברים ברשימה</li><li><b>1</b>ערב</li></ul>
       </section>
 
+      <section><div className="card">
+        <h2>אנחנו צריכים את העזרה שלכם</h2>
+        <p className="sub">לכל אחד מכם יש בטלפון מישהו או מישהי שהיו איתכם בשכבה. הזמינו אותם, ורק ככה נגיע לכולם.</p>
+        {inside ? <Link href="/invite" className="btn">הזמינו חבר מהשכבה</Link> : <Link href="/join" className="btn">מצאו את השם שלכם</Link>}
+      </div></section>
+
       {inside && person && <section><div className="card welcome"><span className="wave">👋</span><h2>היי {person.name.split(' ').reverse().join(' ')}</h2><p className="sub">שמחים שבאתם. עזרו לנו להגיע לכולם.</p><Link href="/me" className="btn">עדכון הפרטים שלי</Link></div></section>}
 
       {inside && ann.map((a) => (
