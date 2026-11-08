@@ -31,15 +31,15 @@ export default function Me() {
       <form className="card" onSubmit={save}>
         <h2>הפרטים שלי</h2>
         <fieldset disabled={state === 'saving' || state === 'loading'} style={{ border: 0, padding: 0, margin: 0 }}>
+        <label htmlFor="phone">טלפון</label>
+        <input id="phone" type="tel" inputMode="tel" dir="ltr" value={f.phone} onChange={set('phone')} />
+        <label htmlFor="mail">אימייל</label>
+        <input id="mail" type="email" inputMode="email" dir="ltr" value={f.email} onChange={set('email')} />
         <label>מתכוונים להגיע לערב המחזור? (בערך באפריל, בנס ציונה)</label>
         <div className="seg two" role="group" aria-label="האם אתם מתכוונים להגיע">
           {[['yes', 'כן, אני בא/ה'], ['no', 'כנראה שלא']].map(([k, t]) => <button type="button" key={k} aria-pressed={f.rsvp === k} onClick={() => { setF({ ...f, rsvp: f.rsvp === k ? 'unknown' : k }); setState('ready'); }}>{t}</button>)}
         </div>
         <p className="hint">זו רק כוונה ולא התחייבות, ואפשר לשנות בכל רגע.</p>
-        <label htmlFor="phone">טלפון</label>
-        <input id="phone" type="tel" inputMode="tel" dir="ltr" value={f.phone} onChange={set('phone')} />
-        <label htmlFor="mail">אימייל</label>
-        <input id="mail" type="email" inputMode="email" dir="ltr" value={f.email} onChange={set('email')} />
         <label htmlFor="job">עיסוק (לא חובה)</label>
         <input id="job" type="text" value={f.occupation} onChange={set('occupation')} placeholder="למשל: רופאה, מפתח, מורה" />
         <p className="hint">לא חובה, ואף אחד לא לוחץ 🙂 אבל תמיד טוב לדעת אם יש רופא בקהל, דיג'יי, או מישהו שיסדר לנו הנחה בקייטרינג 😉</p>

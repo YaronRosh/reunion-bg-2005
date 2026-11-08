@@ -96,9 +96,6 @@ export default function Join() {
         <label htmlFor="mail">אימייל</label>
         <input id="mail" type="email" inputMode="email" autoComplete="email" dir="ltr" required value={mail} onChange={(e) => setMail(e.target.value)} placeholder="name@gmail.com" />
         <p className="hint">כדי שנוכל לעדכן אתכם על הערב. הטלפון והאימייל גלויים רק למארגנים.</p>
-        <label htmlFor="job">במה אתם עוסקים היום? (לא חובה)</label>
-        <input id="job" type="text" autoComplete="organization-title" value={job} onChange={(e) => setJob(e.target.value)} placeholder="למשל: רופאה, מפתח, מורה" />
-        <p className="hint">לא חובה, ואף אחד לא לוחץ 🙂 אבל תמיד טוב לדעת אם יש רופא בקהל, דיג'יי, או מישהו שיסדר לנו הנחה בקייטרינג 😉</p>
         {SHOW_RSVP && <>
         <label>מתכוונים להגיע לערב המחזור? (בערך באפריל, בנס ציונה)</label>
         <div className="seg two" role="group" aria-label="האם אתם מתכוונים להגיע">
@@ -106,6 +103,9 @@ export default function Join() {
         </div>
         <p className="hint">זו רק כוונה ולא התחייבות. אפשר לשנות בכל רגע ב"הפרטים שלי".</p>
         </>}
+        <label htmlFor="job">במה אתם עוסקים היום? (לא חובה)</label>
+        <input id="job" type="text" autoComplete="organization-title" value={job} onChange={(e) => setJob(e.target.value)} placeholder="למשל: רופאה, מפתח, מורה" />
+        <p className="hint">לא חובה, ואף אחד לא לוחץ 🙂 אבל תמיד טוב לדעת אם יש רופא בקהל, דיג'יי, או מישהו שיסדר לנו הנחה בקייטרינג 😉</p>
         {err && <p className="err">{err}</p>}
         <div className="row" style={{ marginTop: 18 }}>
           <button className="btn" disabled={busy}>{busy ? 'שומרים...' : 'שמרו'}</button>
