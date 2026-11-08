@@ -42,7 +42,7 @@ export default function Home() {
 
       <section><div className="card">
         <h2>אנחנו צריכים את העזרה שלכם</h2>
-        <p className="sub">לכל אחד מכם יש בטלפון מישהו או מישהי שהיו איתכם בשכבה. הזמינו אותם, ורק ככה נגיע לכולם.</p>
+        <p className="sub">לכל אחד מכם יש בטלפון מישהו או מישהי שהיו איתנו בשכבה. הזמינו אותם, ורק ככה נגיע לכולם.</p>
         {inside ? <Link href="/invite" className="btn">הזמינו חבר מהשכבה</Link> : <Link href="/join" className="btn">מצאו את השם שלכם</Link>}
       </div></section>
 
