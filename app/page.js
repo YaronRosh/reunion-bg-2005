@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getPeople, getAnnouncements, stats, setRsvp } from '@/lib/data';
+import { getPeople, getAnnouncements, stats, setRsvp, source } from '@/lib/data';
 import { Dashboard } from '@/components/ui';
 import { useAuth } from '@/components/auth';
 
@@ -69,7 +69,7 @@ export default function Home() {
       {inside && <section>
         <div className="card">
           <div className="row" style={{ justifyContent: 'space-between', alignItems: 'center' }}><h2 style={{ margin: 0 }}>מי כבר כאן, ומי עוד חסר</h2><button type="button" className="pill" onClick={refresh} disabled={refreshing} aria-label="רענון הנתונים">{refreshing ? 'מרענן...' : '↻ רענון'}</button></div>
-          <p className="sub">{people ? `${t.total} אנשים בעשר כיתות, ${t.sure} כבר מצאנו. כל שם שתמצאו הוא עוד אחד שיגיע.` : 'טוען...'}</p>
+          <p className="sub">{people && !source.crm ? 'לא הצלחנו לטעון את הנתונים העדכניים, מוצגים נתוני גיבוי. נסו "רענון".' : people ? `${t.total} אנשים בעשר כיתות, ${t.sure} כבר מצאנו. כל שם שתמצאו הוא עוד אחד שיגיע.` : 'טוען...'}</p>
           {people && <Dashboard t={t} by={by} />}
           <div className="row" style={{ marginTop: 20 }}>
             <button className="btn" onClick={share}>שלחו לחבר מהשכבה</button>
