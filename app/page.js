@@ -12,7 +12,12 @@ export default function Home() {
   const inside = status === 'member' || status === 'admin';
   const [people, setPeople] = useState(null);
   const [ann, setAnn] = useState([]);
-  useEffect(() => { if (inside) { getPeople().then(setPeople); getAnnouncements().then(setAnn); } }, [inside]);
+  useEffect(() => {
+    if (!inside) return;
+    getPeople().then(setPeople); getAnnouncements().then(setAnn);
+    const t = setInterval(() => { if (!document.hidden) getPeople().then((l) => l?.length && setPeople(l)); }, 60000);
+    return () => clearInterval(t);
+  }, [inside]);
   const { t, by } = stats(people || []);
   const share = () => {
     const text = 'מחזור 2005 בן גוריון: ערב מחזור באזור אפריל בנס ציונה. בואו לוודא שאתם ברשימה ועזרו לנו להגיע לכולם: ' + location.origin;
