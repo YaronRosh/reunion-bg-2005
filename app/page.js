@@ -12,12 +12,9 @@ export default function Home() {
   const inside = status === 'member' || status === 'admin';
   const [people, setPeople] = useState(null);
   const [ann, setAnn] = useState([]);
-  useEffect(() => {
-    if (!inside) return;
-    getPeople().then(setPeople); getAnnouncements().then(setAnn);
-    const t = setInterval(() => { if (!document.hidden) getPeople().then((l) => l?.length && setPeople(l)); }, 60000);
-    return () => clearInterval(t);
-  }, [inside]);
+  useEffect(() => { if (inside) { getPeople().then(setPeople); getAnnouncements().then(setAnn); } }, [inside]);
+  const [refreshing, setRefreshing] = useState(false);
+  const refresh = async () => { if (refreshing) return; setRefreshing(true); try { const l = await getPeople(); if (l?.length) setPeople(l); } catch {} setRefreshing(false); };
   const { t, by } = stats(people || []);
   const share = () => {
     const text = 'מחזור 2005 בן גוריון: ערב מחזור באזור אפריל בנס ציונה. בואו לוודא שאתם ברשימה ועזרו לנו להגיע לכולם: ' + location.origin;
@@ -71,7 +68,7 @@ export default function Home() {
 
       {inside && <section>
         <div className="card">
-          <h2>מי כבר כאן, ומי עוד חסר</h2>
+          <div className="row" style={{ justifyContent: 'space-between', alignItems: 'center' }}><h2 style={{ margin: 0 }}>מי כבר כאן, ומי עוד חסר</h2><button type="button" className="pill" onClick={refresh} disabled={refreshing} aria-label="רענון הנתונים">{refreshing ? 'מרענן...' : '↻ רענון'}</button></div>
           <p className="sub">{people ? `${t.total} אנשים בעשר כיתות, ${t.sure} כבר מצאנו. כל שם שתמצאו הוא עוד אחד שיגיע.` : 'טוען...'}</p>
           {people && <Dashboard t={t} by={by} />}
           <div className="row" style={{ marginTop: 20 }}>
