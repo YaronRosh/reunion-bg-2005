@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { getPeople, getAnnouncements, stats, setRsvp, source } from '@/lib/data';
 import { Dashboard } from '@/components/ui';
 import { useAuth } from '@/components/auth';
+import { ShareButtons } from '@/components/share';
 
 export default function Home() {
   const { status, person } = useAuth();
@@ -74,6 +75,7 @@ export default function Home() {
           <div className="row" style={{ marginTop: 20 }}>
             <button className="btn" onClick={share}>שלחו לחבר מהשכבה</button>
           </div>
+          <div style={{ marginTop: 16 }}><ShareButtons /></div>
         </div>
       </section>}
     </main>

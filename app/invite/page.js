@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { getPeople } from '@/lib/data';
 import { searchPeople } from '@/lib/search';
 import { useAuth } from '@/components/auth';
+import { ShareButtons } from '@/components/share';
 
 const toIntl = (p) => { const d = (p || '').replace(/\D/g, ''); return d.startsWith('972') ? d : d.startsWith('0') ? '972' + d.slice(1) : d; };
 const STATE = { sure: ['בפנים', 'var(--sure)'], maybe: ['צריך לאשר', 'var(--maybe)'], none: ['עוד לא מצאנו', 'var(--none)'] };
@@ -49,6 +50,7 @@ export default function Invite() {
         </div>
       </>}
     </section>
+    <section className="card" style={{ marginTop: 16 }}><ShareButtons /></section>
     <div className="row" style={{ marginTop: 16 }}><a className="btn ghost" href="/">← חזרה לדשבורד</a></div>
     </main>
   );
