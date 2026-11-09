@@ -1,6 +1,6 @@
 // קריאה/כתיבה ל-Pecanify מצד השרת בלבד. המפתח נשמר ב-PECANIFY_API_KEY ב-Vercel.
 // המשתמש יכול לגעת רק בכרטיס של השם שהוא רשם (נבדק מול Supabase עם הטוקן שלו).
-import { BASE, H, key, norm, firstArray, allCards, lastDiag } from '@/lib/crm';
+import { BASE, H, key, norm, firstArray, allCards, freshCard, lastDiag } from '@/lib/crm';
 
 async function myRow(token) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL, anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -25,6 +25,10 @@ async function byName(name) {
   return list;
 }
 async function findCard(me) {
+  const c = await findCardStale(me);
+  return c ? (await freshCard(c.id)) || c : null;
+}
+async function findCardStale(me) {
   if (me.crm_id) {
     const r = await fetch(`${BASE}/${me.crm_id}`, { headers: H() });
     if (r.ok) { const j = await r.json(); const c = j.data || j; if (c && c.id) return c; }

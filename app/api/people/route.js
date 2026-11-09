@@ -1,16 +1,16 @@
 // רשימת האנשים לדשבורד, מ-Pecanify. בלי טלפון ובלי אימייל.
-import { allCards, key, lastDiag } from '@/lib/crm';
+import { allCards, freshCards, key, lastDiag } from '@/lib/crm';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
-const CACHE = { 'Cache-Control': 'public, s-maxage=20, stale-while-revalidate=300' };
+const CACHE = { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=300' };
 let cache = { at: 0, rows: null };
 
 export async function GET() {
   try {
     if (!key()) return Response.json({ ok: false, error: 'PECANIFY_API_KEY missing' }, { status: 500 });
-    if (cache.rows && Date.now() - cache.at < 30000) return Response.json({ ok: true, people: cache.rows }, { headers: CACHE });
-    const cards = await allCards();
+    if (cache.rows && Date.now() - cache.at < 45000) return Response.json({ ok: true, people: cache.rows }, { headers: CACHE });
+    const cards = await freshCards(await allCards());
     const rows = cards.map((c, i) => {
       const f = c.customFields || {};
       return {
